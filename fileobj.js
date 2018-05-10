@@ -11,14 +11,12 @@ console.log(`>--- ${aktFile} ---<`);
 const readDirAsync = promisify(readDir);
 const filePath = process.argv[2];
 const dir = "/home/micha/Schreibtisch/moduleMA";
-const exklOrdner = ["node_modules"];  // nicht verwendete Ordner 
-const suchDatei = ["package.json", "index.js"]; // gesuchte Dateinamen
+const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
+const inclDateien = ["package.json", "index.js"]; // gesuchte Dateinamen
 
 flist = async () => {
     try {
       const fileList = await readDirAsync(dir);
-      // console.log("fileList[0]", fileList[0]);
-      // console.log("base", path.basename(fileList[0]));
       return fileList;
     }
     catch (err) {
@@ -26,32 +24,31 @@ flist = async () => {
     }
   }
 
-flist().then((fl) => {
-
-  let filtEx = [...fl];
-  filtEx = filtEx.filter((el) => {
-    
+const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
+  return [...filtArr].filter((el) => {
     let exclude = false;
-    exklOrdner.forEach((suchEl) => {
-      if (!exclude && el.search(suchEl)>-1) exclude = true;
-    })
+    exclArr.forEach((suchEl) => {
+      if (!exclude && el.search(suchEl) > -1) exclude = true;
+    });
     return !exclude;
   });
+};
 
-  let filtIn = [...filtEx];
-  filtIn = filtIn.filter((el) => {
+const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
+  return [...filtArr].filter((el) => {
     let include = false;
-    suchDatei.forEach( (suchEl)=>{
-      if (!include) include = path.basename(el)===suchEl;
+    inclArr.forEach((suchEl) => {
+      if (!include) include = el.search(suchEl) > -1; // alternativ: if (!include) include = path.basename(el) === suchEl;
     });
     return include;
   });
+};
 
- filtIn.forEach((el) => {
-    let name = path.basename(el);
+flist().then((fl) => {
+  let filtEx = filterEx(fl, exclOrdner);
+  let filtIn = filterIn(filtEx, inclDateien);
+  filtIn.forEach((el) => {
     console.log(`${path.dirname(el)}: ${path.basename(el)},`);
   })
-
 })
-  .catch((err)=>console.log(err));
-  ;
+.catch((err)=>console.log(err));
