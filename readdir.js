@@ -1,6 +1,9 @@
 var fs = require('fs');
 var path = require('path');
 
+const aktFile = path.basename(__filename);
+console.log(`--- ${aktFile} ---`);
+
 var walk = function(dir, done) {
   var results = [];
   fs.readdir(dir, function(err, list) {
