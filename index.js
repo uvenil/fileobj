@@ -14,7 +14,7 @@
   const readDirAsync = promisify(readDir);
   const filePath = process.argv[2];
   const ord = "/home/micha/Schreibtisch/werkma/modulema";
-  const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
+  const exclOrdner = ["node_modules", "alt"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
 
 const filelist = async (ordner = ord) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
@@ -48,6 +48,32 @@ const jsonAusOrdner = async (ordner = ord) => {  // bestimmte json-Dateien aus o
   let jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
   return jsonObj;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
 };
+const csvAusJson = (jsonObj, zuerstZeile = true) => { // erstellt aus einem verschachtelten json-Objekt eine csv-Tabelle, zuerstZeile -> äußere Attribute bilden die Zeile
+  let obj = jsonObj;
+  let z1 = "Attr2 \\ Attr1";
+  if (!zuerstZeile) {
+    obj = objinout(obj);
+    z1 = "Attr1 \\ Attr2";
+  }  
+  let keys = Object.keys(obj);  // alle vorkommenden Attribute in der 1. Ebene
+  z1 = keys.reduce((a, v) => a.concat("," + String(v).replace(/,/g, '-')), z1);
+  let set = new Set([]);  // alle vorkommenden Attribute in der 2. Ebene
+  keys.forEach((key) => {
+    Object.keys(obj[key]).forEach((k) => set.add(k))
+  });
+  let z = [z1];
+  let i = 1;
+  Array.from(set).map((k2) => {
+    z[i] = String(k2).replace(/,/g, '-');
+    z[i] = keys.reduce((a, v) => {
+      let val = obj[v][k2];
+      if (typeof val === "object")  val = JSON.stringify(val);  // Objekte und Arrays in json-Strings umwandeln
+      return a.concat("," + String(val).replace(/,/g, '-'));
+    }, z[i]);
+    i++;
+  });
+  return z.join("\r\n");
+};
 const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   let jsonObj = await jsonAusOrdner(ordner);
   let resPath = './result';
@@ -57,9 +83,15 @@ const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mi
   await fs.writeJson(path.join(resPath, 'inoutObj.json'), inoutObj);
   return inoutObj;
 };
-main().then((result) => {
+const csv = async () => {
+  let json = await fs.readJson('./result/inoutObj.json');
+  let csv = csvAusJson(json, false);
+  await fs.writeFile('./result/inoutObj.csv', csv); // csv-Datei speichern
+  return csv;
+};
+csv().then((result) => {
   // console.log(Object.keys(objObj));
-  console.log(result);
+  // console.log(result);
   console.log('Erfolg!');
 }).catch((error) => {
   console.error('error', error);
