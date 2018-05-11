@@ -17,9 +17,9 @@
   const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
 
-const filelist = async (dir) => { // liest alle Dateipfade aus dem Ordner dir und seinen Unterordnern 
+const filelist = async (ordner = ord) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
-    const fileList = await readDirAsync(dir);
+    const fileList = await readDirAsync(ordner);
     return fileList;
   }
   catch (err) {
@@ -40,12 +40,12 @@ const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipf
   }
 };
 const jsonAusOrdner = async (ordner = ord) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
-  let fl = await filelist(ordner); // fl = filelist = Liste mit Dateipfaden
-  let filtEx = filterEx(fl, exclOrdner);
-  let filtIn = filterIn(filtEx, inclDateien);
+  let fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
+  let filtEx = filterEx(fileList, exclOrdner);  // hinausfiltern
+  let filtIn = filterIn(filtEx, inclDateien); // herausziehen
   let indArr = filtIn.map((el) => el.replace(ordner, ""));  // Array mit relativen Dateipfaden wird zu den keys
   let jsonArr = await readJsonArr(filtIn); // Array aus Json-Objekten
-  let jsonObj = keyArrObj(jsonArr, indArr);
+  let jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
   return jsonObj;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
 };
 const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
