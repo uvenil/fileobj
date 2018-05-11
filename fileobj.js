@@ -7,23 +7,21 @@ const readDir = require('./readdir');
 
 const aktFile = path.basename(__filename);
 console.log(`>--- ${aktFile} ---<`);
-
 const readDirAsync = promisify(readDir);
 const filePath = process.argv[2];
-const dir = "/home/micha/Schreibtisch/moduleMA";
+const ordner = "/home/micha/Schreibtisch/moduleMA";
 const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
-const inclDateien = ["package.json", "index.js"]; // gesuchte Dateinamen
+const inclDateien = ["package.json"]; // gesuchte Dateinamen
 
-flist = async () => {
-    try {
-      const fileList = await readDirAsync(dir);
-      return fileList;
-    }
-    catch (err) {
-      console.log('ERROR:', err);
-    }
+const flist = async (dir) => { // liest alle Dateien inkl. Pfade aus dem Ordner dir und seinen Unterordnern 
+  try {
+    const fileList = await readDirAsync(dir);
+    return fileList;
   }
-
+  catch (err) {
+    console.log('ERROR:', err);
+  }
+}
 const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
   return [...filtArr].filter((el) => {
     let exclude = false;
@@ -33,7 +31,6 @@ const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Elemen
     return !exclude;
   });
 };
-
 const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
   return [...filtArr].filter((el) => {
     let include = false;
@@ -43,12 +40,37 @@ const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Ele
     return include;
   });
 };
-
-flist().then((fl) => {
+const readArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipfad-Array
+  let objRead = {};
+  try{
+    let objArr = await Promise.all(fileArr.map(async (file) => {
+      objRead = await fs.readJson(file);
+      console.log("read:", objRead.name);
+      return objRead;
+    }));
+    console.log('success!');
+    return objArr;
+  }catch(error){
+    console.error('error', error);
+  }
+};
+flist(ordner).then((fl) => { // fl = filelist
   let filtEx = filterEx(fl, exclOrdner);
   let filtIn = filterIn(filtEx, inclDateien);
-  filtIn.forEach((el) => {
-    console.log(`${path.dirname(el)}: ${path.basename(el)},`);
-  })
-})
-.catch((err)=>console.log(err));
+  return readArr(filtIn);
+}).then((objArr) => {
+  // console.log(filtIn);
+  console.log(objArr[2]);
+}).catch((error) => {
+  console.error('error', error);
+});
+  
+  // filtIn.forEach((el) => {
+  //   console.log(`${path.dirname(el)}: ${path.basename(el)},`);
+  // })
+// .catch((err)=>console.log(err));
+
+
+// readArr();
+
+// await fs.writeJson('./pack1.json', { ...packObj, name: 'fs-extra', micha: 'lieb!' })
