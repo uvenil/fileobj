@@ -13,9 +13,12 @@
   console.log(`>--- ${aktFile} ---<`);
   const readDirAsync = promisify(readDir);
   const filePath = process.argv[2];
+  // Einstellungen
   const ord = "/home/micha/Schreibtisch/werkma/modulema";
   const exclOrdner = ["node_modules", "alt"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
+  const resPath = './../result';
+  const zuerstZeile = true;
 
 const filelist = async (ordner = ord) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
@@ -48,10 +51,10 @@ const jsonAusOrdner = async (ordner = ord) => {  // bestimmte json-Dateien aus o
   let jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
   return jsonObj;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
 };
-const csvAusJson = (jsonObj, zuerstZeile = true) => { // erstellt aus einem verschachtelten json-Objekt eine csv-Tabelle, zuerstZeile -> äußere Attribute bilden die Zeile
+const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschachtelten json-Objekt eine csv-Tabelle, zuerstZ -> äußere Attribute bilden die Zeile
   let obj = jsonObj;
   let z1 = "Attr2 \\ Attr1";
-  if (!zuerstZeile) {
+  if (!zuerstZ) {
     obj = objinout(obj);
     z1 = "Attr1 \\ Attr2";
   }  
@@ -76,20 +79,17 @@ const csvAusJson = (jsonObj, zuerstZeile = true) => { // erstellt aus einem vers
 };
 const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   let jsonObj = await jsonAusOrdner(ordner);
-  let resPath = './result';
+  let csvObj = csvAusJson(jsonObj, zuerstZeile); // csv erzeugen
   if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
   await fs.writeJson(path.join(resPath, 'jsonObj.json'), jsonObj);
+  await fs.writeFile(path.join(resPath, 'jsonObj.csv'), csvObj); // csv-Datei speichern
   let inoutObj = objinout(jsonObj); // äußere Attribute mit ineren vertauschen
+  let csvInout = csvAusJson(inoutObj, zuerstZeile); // csv erzeugen
   await fs.writeJson(path.join(resPath, 'inoutObj.json'), inoutObj);
+  await fs.writeFile(path.join(resPath, 'inoutObj.csv'), csvInout); // csv-Datei speichern
   return inoutObj;
 };
-const csv = async () => {
-  let json = await fs.readJson('./result/inoutObj.json');
-  let csv = csvAusJson(json, false);
-  await fs.writeFile('./result/inoutObj.csv', csv); // csv-Datei speichern
-  return csv;
-};
-csv().then((result) => {
+main().then((result) => {
   // console.log(Object.keys(objObj));
   // console.log(result);
   console.log('Erfolg!');
@@ -97,6 +97,12 @@ csv().then((result) => {
   console.error('error', error);
 });
 // Testcode
+  // const csv = async () => { // wird nicht verwendet
+  //   let json = await fs.readJson('./result/inoutObj.json');
+  //   let csv = csvAusJson(json, zuerstZeile);
+  //   await fs.writeFile('./result/inoutObj.csv', csv); // csv-Datei speichern
+  //   return csv;
+  // };
   // let a1 = [2];
   // let k1 = [1,2];
   // let res = keyArrObj(a1, k1);
