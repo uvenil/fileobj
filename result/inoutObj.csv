@@ -1,4 +1,0 @@
-Attr2 \ Attr1,name,version,description,main,scripts,bin,author,license,dependencies
-/obj-inout/package.json,obj-inout,1.0.8,{"id1":{"ida":10}- "id2":{"ida":20}} <-> {"ida":{"id1":10- "id2":20}},index.js,{"test":"node index.test.js"-"prepublishOnly":"npm test"},{"obj-inout":"bin/obj-inout.js"},uvenil,MIT,{"yargs":"^8.0.1"}
-/obj-inout (Kopie)/package.json,obj-inout,1.0.8,{"id1":{"ida":10}- "id2":{"ida":20}} <-> {"ida":{"id1":10- "id2":20}},index.js,{"test":"node index.test.js"-"prepublishOnly":"npm test"},{"obj-inout":"bin/obj-inout.js"},uvenil,MIT,{"yargs":"^8.0.1"}
-/obj-inout-usage/package.json,obj-inout-usage,1.0.0,,index.js,{"test":"echo \"Error: no test specified\" && exit 1"},undefined,,ISC,{"obj-inout":"^1.0.6"}
