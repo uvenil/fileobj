@@ -12,7 +12,7 @@
   console.log(`>--- ${aktFile} ---<`);
   const readDirAsync = promisify(readDir);
   const filePath = process.argv[2];
-  const ord = "/home/micha/Schreibtisch/moduleMA";
+  const ord = "/home/micha/Schreibtisch/werkma/modulema";
   const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
 
