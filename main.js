@@ -6,6 +6,7 @@
 
   const readDir = require('./readdir');
   const objinout = require('./objinout');
+  const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -16,7 +17,7 @@
   const exclOrdner = ["node_modules"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
 
-const flist = async (dir) => { // liest alle Dateipfade aus dem Ordner dir und seinen Unterordnern 
+const filelist = async (dir) => { // liest alle Dateipfade aus dem Ordner dir und seinen Unterordnern 
   try {
     const fileList = await readDirAsync(dir);
     return fileList;
@@ -25,24 +26,6 @@ const flist = async (dir) => { // liest alle Dateipfade aus dem Ordner dir und s
     console.log('ERROR:', err);
   }
 }
-const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
-  return [...filtArr].filter((el) => {
-    let exclude = false;
-    exclArr.forEach((suchEl) => {
-      if (!exclude && el.search(suchEl) > -1) exclude = true;
-    });
-    return !exclude;
-  });
-};
-const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
-  return [...filtArr].filter((el) => {
-    let include = false;
-    inclArr.forEach((suchEl) => {
-      if (!include) include = el.search(suchEl) > -1; // alternativ: if (!include) include = path.basename(el) === suchEl;
-    });
-    return include;
-  });
-};
 const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipfad-Array
   let objRead = {};
   try{
@@ -56,19 +39,8 @@ const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipf
     console.error('error', error);
   }
 };
-const keyArrObj = (arr, keys) => {  // erstellt aus einem Array und ein Attribut-Array ein Objekt
-  let obj = {};
-  let i = 0;
-  keys.forEach((key) => {
-    obj[new String(key)] = arr[i++] || null;  // keys ohne zugehörige Werte erhalten den Wert null
-  });
-  if (arr.length>keys.length) {
-    obj["restarray"] = arr.slice(keys.length, arr.length);  // restliches Array befindet sich im Attribut "restarray"
-  }  
-  return obj;
-};
 const jsonAusOrdner = async (ordner = ord) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
-  let fl = await flist(ordner); // fl = filelist = Liste mit Dateipfaden
+  let fl = await filelist(ordner); // fl = filelist = Liste mit Dateipfaden
   let filtEx = filterEx(fl, exclOrdner);
   let filtIn = filterIn(filtEx, inclDateien);
   let indArr = filtIn.map((el) => el.replace(ordner, ""));  // Array mit relativen Dateipfaden wird zu den keys
