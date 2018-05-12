@@ -2,6 +2,7 @@ const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
 const o2 = { "c": { "f": 5 }, "d": { "g": 6, "h": { "i": 7 } } };
 const oa = [o1, o2];
+const delim = ";"
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
@@ -9,37 +10,36 @@ const isPrimitve = (testPrim) => {
   if (testPrim === null || testPrim === undefined) return true;
   return (!Array.isArray(testPrim) && !Object.isObject(testPrim));
 };
-class PropAttr {  // (key, parentKey, objLevel, levelInd, pathKey, val), Attribute der Property (key) eines Objekts
-  constructor(key, parentKey, objLevel, levelInd, pathKey, val) {
-    this.key = key;
-    this.levelInd = levelInd; // Index im Array der Keys der Ebene
-    this.objLevel = objLevel; // Ebene im Objekt
-    this.parentKey = parentKey;
+class PropAttr {  // (pathKey, val, levelInd), Attribute der Property (key) eines Objekts
+  constructor(pathKey, val, levelInd) {
     this.pathKey = pathKey; // Pfad bis zum key als Objekt-eindeutiger key 
     this.val = val;
+    let pathArr = pathKey.split(delim);
+    this.key = pathArr[pathArr.length-1];
+    this.levelInd = levelInd; // Index im Array der Keys des Objekts
+    this.objLevel = pathArr.length - 1; // Ebene im Objekt (0=Objekt)
+    this.parentKey = pathArr[pathArr.length - 2];
   }
 }
-const objPropAttr = (obj, parentKey, objLevel, parentPathKey) => { // erstellt Array mit PropAttr von obj
+const objPropAttr = (obj, parentPathKey) => { // erstellt Array mit PropAttr von obj
   let i = 0;
   let keys = Object.keys(obj);
-  let levelKeys = keys.map((key) => {
-    // (key, parentKey, objLevel, levelInd, pathKey, val)
-    return new PropAttr(key, parentKey, objLevel, i++, parentPathKey + key, obj[key])
+  let objKeys = keys.map((key) => {
+    // (pathKey, val, levelInd)
+    return new PropAttr(parentPathKey + delim + key, obj[key], i++)
   });
-  return levelKeys;
+  return objKeys;
 };
 const keysshallow = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller keys (shallow)
   let objKeys = [];
   let levelKeys = [];
-  let parentPathKey = "";
-  let parentKey = objName;
-  let objLevel = 0;  // Attribute der 1. Ebene
-  let levelInd = 0; // Index im Array der Keys der Ebene
+  let parentPathKey = objName;
+  // let objLevel = 0;  // Attribute der 1. Ebene
+  // let levelInd = 0; // Index im Array der Keys der Ebene
   let objarr = [obj]; // aktuelles Objekt-Array
   // [{obj, parent}]
   objarr.forEach((o) => {
-    parentPathKey += parentKey+".";
-    levelKeys = objPropAttr(o, parentKey, objLevel, parentPathKey)
+    levelKeys = objPropAttr(o, parentPathKey)
 
   });
   objKeys.push(levelKeys);
