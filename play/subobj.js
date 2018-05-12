@@ -33,17 +33,21 @@ const objPropAttr = (obj, parentPathKey) => { // erstellt Array mit PropAttr von
 const keysshallow = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller keys (shallow)
   let objKeys = [];
   let levelKeys = [];
-  let parentPathKey = objName;
   // let objLevel = 0;  // Attribute der 1. Ebene
   // let levelInd = 0; // Index im Array der Keys der Ebene
   let objarr = [obj]; // aktuelles Objekt-Array
-  // [{obj, parent}]
-  objarr.forEach((o) => {
-    levelKeys = objPropAttr(o, parentPathKey)
-
+  let parentPathArr = [objName];
+  let gesArr = [{   // Gesamt und Ergebnis-Array
+    "o": obj,
+    "parentPathArr": objName,
+    "objKeys": []
+  }];
+  let i = 0;
+  gesArr.forEach((o) => {
+    o["objKeys"] = objPropAttr(o["o"], o["parentPathArr"])
   });
-  objKeys.push(levelKeys);
-  console.log(levelKeys);
+  objKeys.push(gesArr[0]["objKeys"]);
+  console.log(objKeys);
   
   // let k2 = k1.forEach((v,i,a) => {
   //   Object.keys(obj[key][0]); // 
