@@ -20,6 +20,7 @@
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
   const resPath = './../result';
   const zuerstZeile = true;
+  const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
 const filelist = async (ordner = ord) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
@@ -70,7 +71,7 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   Array.from(set).map((k2) => {
     z[i] = String(k2).replace(/,/g, '-');
     z[i] = keys.reduce((a, v) => {
-      let val = obj[v][k2] || " ---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
+      let val = obj[v][k2] || leerWert; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
       if (typeof val === "object")  val = JSON.stringify(val);  // Objekte und Arrays in json-Strings umwandeln
       return a.concat("," + String(val).replace(/,/g, '-'));
     }, z[i]);
