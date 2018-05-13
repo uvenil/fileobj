@@ -1,6 +1,6 @@
 const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
-const o2 = { "c": { "f": 5 }, "d": { "g": 6, "h": { "i": 7 } } };
+const o2 = { "c": { "f": 5 }, "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } };
 const oa = [o1, o2];
 const delim = ";"
 Object.prototype.isObject = (testObj) => {
@@ -21,55 +21,49 @@ class PropAttr {  // (pathKey, val, levelInd), Attribute der Property (key) eine
     this.parentKey = pathArr[pathArr.length - 2];
   }
 }
-const objPropAttr = (obj, parentPathKey) => { // erstellt Array mit PropAttr von obj
+const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von obj
   let i = 0;
   let keys = Object.keys(obj);
   let objKeys = keys.map((key) => {
     // (pathKey, val, levelInd)
-    return new PropAttr(parentPathKey + delim + key, obj[key], i++)
+    return new PropAttr(objPathKey + delim + key, obj[key], i++)
   });
   return objKeys;
 };
-const keysshallow = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller keys (shallow)
-  let objKeys = [];
-  // let levelKeys = [];
-  // let objLevel = 0;  // Attribute der 1. Ebene
-  // let levelInd = 0; // Index im Array der Keys der Ebene
-  // let objarr = [obj]; // aktuelles Objekt-Array
-  // let parentPathKey = [objName];
-  let i = 0;
-  let nextEbArr = [];
+const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
+  let allObjects = [];
+  let nextEbenenObjects = [];
+  let nextUnterObjects = []; // Array mit den Kind-Objekten
   let nextObjKeys = []; // Keys der Kind-Objekte zum aktuelle Unterobjekt
-  let nextUoArr = []; // Array mit den Kind-Objekten
   let aktObj; // aktuelles Unterobjekt
-  let ebenenArr = [{   // Ebenen-Array mit zugehörigen Unterobjekten
+  let i = 0;
+  let aktEbenenObjects = [{   // Ebenen-Array startetmit root-Objekt als einzigem Unterobjekt
     "unterobj": obj, // Unterobjekt in dieser Ebene des Hauptobjekts
-    "parentPathKey": objName, // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
-    "objKeys": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
+    "objPathKey": objName, // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
+    "propAttr": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
   }];
-  ebenenArr.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
-    aktObj = uo["unterobj"];
-    uo["objKeys"] = objPropAttr(aktObj, uo["parentPathKey"])  // neue Objekt-Array definieren und  daraus Ebenen-Array der nächsten Ebene machen
-    // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
-    nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key]));
-    console.log(nextObjKeys);
-    nextUoArr = nextObjKeys.map((key) => ({
-      "unterobj": aktObj[key],
-      "parentPathKey": uo.parentPathKey+delim+key,
-      "objKeys": [] // wird im nächsten Zyklus befüllt
-    }) );
-    nextEbArr.push(...nextUoArr);
-    //           while (nextObjKeys.length>0) {
-    // }
-  });
-  console.log("nextEbArr", nextEbArr);
-  // nextEbArr wird neue ebenenArray
-  objKeys.push(ebenenArr[0]["objKeys"]);
-  console.log(objKeys);
-  
-  // let k2 = k1.forEach((v,i,a) => {
-  //   Object.keys(obj[key][0]); // 
-  // }
+  while (aktEbenenObjects.length>0 && i++<9) {
+    nextEbenenObjects = [];
+    aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
+      aktObj = uo["unterobj"];
+      uo["propAttr"] = objPropAttr(aktObj, uo["objPathKey"])  // neues Objekt-Array definieren und daraus Ebenen-Array der nächsten Ebene machen
+      // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
+      nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
+      console.log(nextObjKeys);
+      if (nextObjKeys.length>0) { // falls es Unterobjekte zum aktuellen Objekt gibt
+        nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
+          "unterobj": aktObj[key],
+          "objPathKey": uo.objPathKey+delim+key,
+          "propAttr": [] // wird im nächsten Zyklus befüllt
+        }) );
+        nextEbenenObjects.push(...nextUnterObjects);
+      }
+    });
+    console.log("nextEbenenObjects", nextEbenenObjects);
+    allObjects.push(...aktEbenenObjects);
+    aktEbenenObjects = nextEbenenObjects;
+  }
+  console.log("allObjects",allObjects);
 };
 const keysdeep = (obj) => {  // liefert ein Array aller keys (deep)
   let pfad = [];  // aktueller pfad
@@ -111,7 +105,7 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
     if (typeof obj[el] === "object" && !obj[el][0]) { }
   });
 };
-let p = keysshallow(o1, "o1");
+let p = objpath(o2, "o2");
 // console.log(pa);
 
 // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
