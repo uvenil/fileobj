@@ -32,21 +32,39 @@ const objPropAttr = (obj, parentPathKey) => { // erstellt Array mit PropAttr von
 };
 const keysshallow = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller keys (shallow)
   let objKeys = [];
-  let levelKeys = [];
+  // let levelKeys = [];
   // let objLevel = 0;  // Attribute der 1. Ebene
   // let levelInd = 0; // Index im Array der Keys der Ebene
-  let objarr = [obj]; // aktuelles Objekt-Array
-  let parentPathArr = [objName];
-  let gesArr = [{   // Gesamt und Ergebnis-Array
-    "o": obj,
-    "parentPathArr": objName,
-    "objKeys": []
-  }];
+  // let objarr = [obj]; // aktuelles Objekt-Array
+  // let parentPathKey = [objName];
   let i = 0;
-  gesArr.forEach((o) => {
-    o["objKeys"] = objPropAttr(o["o"], o["parentPathArr"])
+  let nextEbArr = [];
+  let nextObjKeys = []; // Keys der Kind-Objekte zum aktuelle Unterobjekt
+  let nextUoArr = []; // Array mit den Kind-Objekten
+  let aktObj; // aktuelles Unterobjekt
+  let ebenenArr = [{   // Ebenen-Array mit zugehörigen Unterobjekten
+    "unterobj": obj, // Unterobjekt in dieser Ebene des Hauptobjekts
+    "parentPathKey": objName, // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
+    "objKeys": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
+  }];
+  ebenenArr.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
+    aktObj = uo["unterobj"];
+    uo["objKeys"] = objPropAttr(aktObj, uo["parentPathKey"])  // neue Objekt-Array definieren und  daraus Ebenen-Array der nächsten Ebene machen
+    // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
+    nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key]));
+    console.log(nextObjKeys);
+    nextUoArr = nextObjKeys.map((key) => ({
+      "unterobj": aktObj[key],
+      "parentPathKey": uo.parentPathKey+delim+key,
+      "objKeys": [] // wird im nächsten Zyklus befüllt
+    }) );
+    nextEbArr.push(...nextUoArr);
+    //           while (nextObjKeys.length>0) {
+    // }
   });
-  objKeys.push(gesArr[0]["objKeys"]);
+  console.log("nextEbArr", nextEbArr);
+  // nextEbArr wird neue ebenenArray
+  objKeys.push(ebenenArr[0]["objKeys"]);
   console.log(objKeys);
   
   // let k2 = k1.forEach((v,i,a) => {
