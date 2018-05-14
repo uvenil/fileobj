@@ -15,10 +15,10 @@
   const filePath = process.argv[2];
   // Einstellungen
   // const ord = "/home/micha/Schreibtisch/werkma/modulema";
-  const ord = "/home/micha/Schreibtisch/UdemyNodeReact";
+  const ord = "./";
   const exclOrdner = ["node_modules", "alt"];  // nicht verwendete Ordner 
   const inclDateien = ["package.json"]; // gesuchte Dateinamen
-  const resPath = './../result';
+  const resPath = './put/output';
   const zuerstZeile = true;
   const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
