@@ -1,10 +1,64 @@
 const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
 const o2 = { "c": { "f": 5 }, "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } };
-const oa = [o1, o2];
+const oa = {...o1, ...o2};
 const delim = ";"
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
+};
+Object.prototype.flatten = (obj = {}, ebenen = 1, stringLength = 20) => { // fasst die erste und zweite Keys zusammen
+  let flatObj = clone(obj);
+  let outKey, inKey;
+  while (ebenen > 0) { 
+    for (outKey in flatObj) {
+      if (Object.isObject(flatObj[outKey])) {
+        for (inKey in flatObj[outKey]) {
+          
+          if (Object.isObject(flatObj[outKey][inKey])) {
+            console.log("io",flatObj[outKey][inKey]);
+            
+            
+            if (flatObj["b"]) {
+              // delete flatObj["b"];
+              delete flatObj.d.h;
+              // delete flatObj[outKey][inKey];
+              console.log("f", flatObj);
+              console.log("o", obj);
+            }
+          
+            
+            flatObj[outKey.slice(0, stringLength - 1) + delim + inKey] = {...flatObj[outKey][inKey]};
+            delete flatObj[outKey][inKey];
+          }
+        }
+      }
+    }
+    ebenen--;
+  }
+  return flatObj;
+};
+const deepclone = (obj) => {
+  let clone = new Object();
+  Object.keys.forEach()
+  clone = Object.assign(clone, obj);
+  return clone
+}; // hier vernünftige Objectkopie tief mit Unterobjekten,  evtl. mit objpath !!!
+const clone = (obj) => {
+  let clone = new Object();
+  clone = Object.assign(clone, obj);
+  return clone
+};
+const clone2 = (obj) => {  // Objekt klonen aus fs.js
+  if (obj === null || typeof obj !== 'object')
+    return obj;
+  if (obj instanceof Object)
+    var copy = { __proto__: obj.__proto__ };
+  else
+    var copy = Object.create(null);
+  Object.getOwnPropertyNames(obj).forEach(function (key) {
+    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
+  })
+  return copy;
 };
 const isPrimitve = (testPrim) => {
   if (testPrim === null || testPrim === undefined) return true;
@@ -38,11 +92,11 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
   let aktObj; // aktuelles Unterobjekt
   let i = 0;
   let aktEbenenObjects = [{   // Ebenen-Array startetmit root-Objekt als einzigem Unterobjekt
-    "unterobj": obj, // Unterobjekt in dieser Ebene des Hauptobjekts
     "objPathKey": objName, // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
+    "unterobj": obj, // Unterobjekt in dieser Ebene des Hauptobjekts
     "propAttr": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
   }];
-  while (aktEbenenObjects.length>0 && i++<9) {
+  while (aktEbenenObjects.length>0 && i++<20) {
     nextEbenenObjects = [];
     aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
       aktObj = uo["unterobj"];
@@ -52,8 +106,8 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
       console.log(nextObjKeys);
       if (nextObjKeys.length>0) { // falls es Unterobjekte zum aktuellen Objekt gibt
         nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
-          "unterobj": aktObj[key],
           "objPathKey": uo.objPathKey+delim+key,
+          "unterobj": aktObj[key],
           "propAttr": [] // wird im nächsten Zyklus befüllt
         }) );
         nextEbenenObjects.push(...nextUnterObjects);
@@ -64,7 +118,9 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
     aktEbenenObjects = nextEbenenObjects;
   }
   console.log("allObjects",allObjects);
+  // console.log("allObjects",JSON.stringify(allObjects));
 };
+// ToDo: Subobjekt nach oben holen und in Excel darstellen!
 const keysdeep = (obj) => {  // liefert ein Array aller keys (deep)
   let pfad = [];  // aktueller pfad
   let keys = [];  // sammelt alle keys
@@ -105,8 +161,10 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
     if (typeof obj[el] === "object" && !obj[el][0]) { }
   });
 };
-let p = objpath(o2, "o2");
-// console.log(pa);
+console.log("oa", oa);
+let flat = Object.flatten(oa);
+console.log("oa", oa);
+console.log("flat", flat);
 
 // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
 // let pa = new PropAttr(...paArr);
