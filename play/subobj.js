@@ -18,6 +18,26 @@ Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   }
   return flatArr;
 };
+Array.prototype.flatcomplete = (nestedArr = [[]]) => {
+  let i = 0;
+  let flatArr = Array.from(nestedArr);
+  let flat = false;
+  while (!flat && i++<20) {
+    flat = true;
+    nestedCopy = Array.from(flatArr);
+    flatArr = [];
+    nestedCopy.forEach(el => {
+      if (Array.isArray(el)) {  // es gibt noch eine Verschachtelung
+        if (flat) flat = false;
+        el.forEach(uel => flatArr.push(uel))
+      } else {
+        flatArr.push(el)
+      }
+    });
+  }
+  return flatArr;
+};
+
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
@@ -157,7 +177,7 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
 // console.log("path", path);
 
 o3 = [1, [2, [5, [[7],8], 3], 9], 4];
-let flat = Array.prototype.flatten(o3, 4);
+let flat = Array.prototype.flatcomplete(o3);
 console.log("o3", o3);
 console.log("flat", flat);
 
