@@ -7,7 +7,7 @@ Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 Object.prototype.flatten = (obj = {}, ebenen = 1, stringLength = 20) => { // fasst die erste und zweite Keys zusammen
-  let flatObj = clone(obj);
+  // let flatObj = clone(obj);
   let outKey, inKey;
   while (ebenen > 0) { 
     for (outKey in flatObj) {
@@ -37,29 +37,6 @@ Object.prototype.flatten = (obj = {}, ebenen = 1, stringLength = 20) => { // fas
   }
   return flatObj;
 };
-const deepclone = (obj) => {
-  let clone = new Object();
-  Object.keys.forEach()
-  clone = Object.assign(clone, obj);
-  return clone
-}; // hier vernünftige Objectkopie tief mit Unterobjekten,  evtl. mit objpath !!!
-const clone = (obj) => {
-  let clone = new Object();
-  clone = Object.assign(clone, obj);
-  return clone
-};
-const clone2 = (obj) => {  // Objekt klonen aus fs.js
-  if (obj === null || typeof obj !== 'object')
-    return obj;
-  if (obj instanceof Object)
-    var copy = { __proto__: obj.__proto__ };
-  else
-    var copy = Object.create(null);
-  Object.getOwnPropertyNames(obj).forEach(function (key) {
-    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
-  })
-  return copy;
-};
 const isPrimitve = (testPrim) => {
   if (testPrim === null || testPrim === undefined) return true;
   return (!Array.isArray(testPrim) && !Object.isObject(testPrim));
@@ -85,7 +62,7 @@ const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von ob
   return objKeys;
 };
 const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
-  let allObjects = [];
+  let objPath = [];
   let nextEbenenObjects = [];
   let nextUnterObjects = []; // Array mit den Kind-Objekten
   let nextObjKeys = []; // Keys der Kind-Objekte zum aktuelle Unterobjekt
@@ -114,11 +91,10 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
       }
     });
     console.log("nextEbenenObjects", nextEbenenObjects);
-    allObjects.push(...aktEbenenObjects);
+    objPath.push(...aktEbenenObjects);
     aktEbenenObjects = nextEbenenObjects;
   }
-  console.log("allObjects",allObjects);
-  // console.log("allObjects",JSON.stringify(allObjects));
+  return objPath;
 };
 // ToDo: Subobjekt nach oben holen und in Excel darstellen!
 const keysdeep = (obj) => {  // liefert ein Array aller keys (deep)
@@ -161,10 +137,9 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
     if (typeof obj[el] === "object" && !obj[el][0]) { }
   });
 };
+let path = objpath(oa);
 console.log("oa", oa);
-let flat = Object.flatten(oa);
-console.log("oa", oa);
-console.log("flat", flat);
+console.log("path", path);
 
 // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
 // let pa = new PropAttr(...paArr);
