@@ -1,12 +1,27 @@
 const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
 const o2 = { "c": { "f": 5 }, "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } };
-const oa = {...o1, ...o2};
+let o3 = {...o1, ...o2};
 const delim = ";"
+Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
+  let flatArr = Array.from(nestedArr);
+  while (depth-- > 0) {
+    nestedCopy = Array.from(flatArr);
+    flatArr = [];
+    nestedCopy.forEach(el => {
+      if (Array.isArray(el)) {
+        el.forEach(uel => flatArr.push(uel))
+      } else {
+        flatArr.push(el)
+      }
+    });
+  }
+  return flatArr;
+};
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
-Object.prototype.flatten = (obj = {}, ebenen = 1, stringLength = 20) => { // fasst die erste und zweite Keys zusammen
+Object.prototype.flatte = (obj = {}, ebenen = 1, stringLength = 20) => { // fasst die erste und zweite Keys zusammen
   // let flatObj = clone(obj);
   let outKey, inKey;
   while (ebenen > 0) { 
@@ -61,7 +76,7 @@ const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von ob
   });
   return objKeys;
 };
-const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
+const objpath = (obj = {}, objName = "Obj") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
   let objPath = [];
   let nextEbenenObjects = [];
   let nextUnterObjects = []; // Array mit den Kind-Objekten
@@ -74,13 +89,14 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
     "propAttr": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
   }];
   while (aktEbenenObjects.length>0 && i++<20) {
+    console.log("aktEbenenObjects.objPathKey", aktEbenenObjects.map(obj=>obj.objPathKey));
     nextEbenenObjects = [];
     aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
       aktObj = uo["unterobj"];
       uo["propAttr"] = objPropAttr(aktObj, uo["objPathKey"])  // neues Objekt-Array definieren und daraus Ebenen-Array der nächsten Ebene machen
       // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
       nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
-      console.log(nextObjKeys);
+      // console.log(nextObjKeys);
       if (nextObjKeys.length>0) { // falls es Unterobjekte zum aktuellen Objekt gibt
         nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
           "objPathKey": uo.objPathKey+delim+key,
@@ -90,7 +106,6 @@ const objpath = (obj = {}, objName = "Objekt") => {  // liefert ein Array aller 
         nextEbenenObjects.push(...nextUnterObjects);
       }
     });
-    console.log("nextEbenenObjects", nextEbenenObjects);
     objPath.push(...aktEbenenObjects);
     aktEbenenObjects = nextEbenenObjects;
   }
@@ -137,16 +152,26 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
     if (typeof obj[el] === "object" && !obj[el][0]) { }
   });
 };
-let path = objpath(oa);
-console.log("oa", oa);
-console.log("path", path);
+// let path = objpath(o3);
+// console.log("o3", o3);
+// console.log("path", path);
 
-// let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
-// let pa = new PropAttr(...paArr);
-// console.log("oa", isPrimitve({"a":2}));
-// console.log("oa", Object.isObject(oa));
-// console.log("p",o2["f"]);
+o3 = [1, [2, [5, [[7],8], 3], 9], 4];
+let flat = Array.prototype.flatten(o3, 4);
+console.log("o3", o3);
+console.log("flat", flat);
+
+
+module.exports = { objpath };
+
 // alter Code
+  // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
+  // let pa = new PropAttr(...paArr);
+  // console.log("oa", isPrimitve({"a":2}));
+  // console.log("oa", Object.isObject(oa));
+  // console.log("p",o2["f"]);
+  // 
+  // 
   // export default class ExpenseForm extends React.Component {
   //   constructor(props) {
   //     super(props);
