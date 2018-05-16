@@ -95,7 +95,7 @@ const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von ob
   });
   return objKeys;
 };
-const objpath = (obj = {}, objName = "obj") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
+const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
   let objPath = [];
   let nextEbenenObjects = [];
   let nextUnterObjects = []; // Array mit den Kind-Objekten
@@ -132,16 +132,8 @@ const objpath = (obj = {}, objName = "obj") => {  // liefert ein Array aller Unt
   }
   return objPath;
 };
-// ToDo: Subobjekt nach oben holen und in Excel darstellen!
-const keysdeep = (obj) => {  // liefert ein Array aller keys (deep)
-  let pfad = [];  // aktueller pfad
-  let keys = [];  // sammelt alle keys
-  let k1 = Object.keys(obj);
-  // let ok1 = k1.filter()
-
-  let k2 = keys.find(key => Object.keys(obj[key][0])); // 
-  if (k) return obj[k];
-};
+// ToDo: Subobjekt nach oben holen und in Excel darstellen!!!
+// gute Funktionen in Module zusammenfassen
 const subobjekte = (obj) => { // Array der Objekte der 2. Ebene, [] falls keine vorhanden
   let objkeys = Object.keys(obj).filter(el => Object.keys(obj[el])[0]); // nur keys, deren Werte Objekte sind
   console.log(objkeys);
@@ -153,77 +145,8 @@ const keyfind = (obj, key) => { // liefert den ersten passenden Key in den Attri
   if (keys[0]) return keys[0];
   else return false;
 };
-const keyfindArr = (objarr, key) => { // liefert aus dem Objektarray den ersten passenden Key in den Attributen der ersten Ebene oder false, falsch keiner gefunden wird
-  let k = false;
-  let obj = objarr.find((obj, ind) => k = keyfind(obj, key));
-  return ind; // gefundener Index
-};
-const objdive = () => {
-
-};
-const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder false, falsch keiner gefunden wird
-  let k = keyfind(obj, key);
-  if (k) return k;
-  Object.keys(obj).forEach(el => {
-    let k2 = Object.keys(obj[el]);
-    if (k2) {
-      let k = keyfind(obj[el], key);
-      if (k) return k;
-    }
-    if (typeof obj[el] === "object" && !obj[el][0]) { }
-  });
-};
-let path = objpath(o3);
-// console.log("o3", o3);
-// console.log("path", path);
+let path = objpath(o3, "g");
+console.log("o3", o3);
+console.log("path", path);
 
 module.exports = { objpath };
-
-// alter Code
-  // console.log("path", Array.prototype.flat(path.map(obj => obj.propAttr)));
-  // const paa = Array.prototype.flat(path.map(obj => obj.propAttr))
-  // const pka = paa.map(pk => pk.pathKey);
-  // let copy = {};
-  // // let copy = {"b":{"e":undefined}};
-  // copy.b = {};
-  // // copy.b.e = undefined;
-  // const objstr = 'copy["'+pka[5]+'"]';
-  // const evalstr = objstr + " = 77";
-  // eval(evalstr);
-  // // console.log(pka[5]);
-  // console.log("copy.b.e",copy.b.e);
-
-  // o3 = [1, [2, [5, [[7],8], 3], 9], 4];
-  // let flat = Array.prototype.flatten(o3,2);
-  // console.log("o3", o3);
-  // console.log("flat", flat);
-  // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
-  // let pa = new PropAttr(...paArr);
-  // console.log("oa", isPrimitve({"a":2}));
-  // console.log("oa", Object.isObject(oa));
-  // console.log("p",o2["f"]);
-  // 
-  // 
-  // export default class ExpenseForm extends React.Component {
-  //   constructor(props) {
-  //     super(props);
-  //     this.state = {
-  //     };
-  //   }
-  //   onDescriptionChange = (e) => {
-  //   };
-  // }
-
-  // const subobj = (obj, key) => { // einfachere Alternative: return obj[key]
-  //   let k = Object.keys(obj).find(el => el === key)
-  //   if (k) return obj[k];
-  //   else return undefined;
-  // };
-
-  // const subobjAlt = (obj, key) => {
-  //   k = Object.keys(obj).filter(el => el === key)
-  //   let subobj = obj[k[0]];
-  //   if (subobj) return subobj;
-  //   else return false;
-  // };
-
