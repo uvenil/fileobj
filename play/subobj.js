@@ -2,7 +2,7 @@ const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
 const o2 = { "c": { "f": 5 }, "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } };
 let o3 = {...o1, ...o2};
-const delim = ";"
+const delim = '"]["';
 Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   let flatArr = Array.from(nestedArr);
   while (depth-- > 0) {
@@ -18,11 +18,11 @@ Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   }
   return flatArr;
 };
-Array.prototype.flatcomplete = (nestedArr = [[]]) => {
+Array.prototype.flat = (nestedArr = [[]]) => {
   let i = 0;
   let flatArr = Array.from(nestedArr);
   let flat = false;
-  while (!flat && i++<20) {
+  while (!flat && i++ < 20) {
     flat = true;
     nestedCopy = Array.from(flatArr);
     flatArr = [];
@@ -37,7 +37,6 @@ Array.prototype.flatcomplete = (nestedArr = [[]]) => {
   }
   return flatArr;
 };
-
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
@@ -96,35 +95,38 @@ const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von ob
   });
   return objKeys;
 };
-const objpath = (obj = {}, objName = "Obj") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
+const objpath = (obj = {}, objName = "obj") => {  // liefert ein Array aller Unterobjekte (unterobj, objPathKey, propAttr) (shallow)
   let objPath = [];
   let nextEbenenObjects = [];
   let nextUnterObjects = []; // Array mit den Kind-Objekten
   let nextObjKeys = []; // Keys der Kind-Objekte zum aktuelle Unterobjekt
   let aktObj; // aktuelles Unterobjekt
-  let i = 0;
+  let i = 0;  // Anzahl Objekt-Ebenen
   let aktEbenenObjects = [{   // Ebenen-Array startetmit root-Objekt als einzigem Unterobjekt
-    "objPathKey": objName, // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
+    "objPathKey": '', // PathKey (z.B. Obj;Attr1;Attr2) des Eltern-Objektes
     "unterobj": obj, // Unterobjekt in dieser Ebene des Hauptobjekts
     "propAttr": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
   }];
-  while (aktEbenenObjects.length>0 && i++<20) {
+  while (aktEbenenObjects.length>0 && i<20) {
     console.log("aktEbenenObjects.objPathKey", aktEbenenObjects.map(obj=>obj.objPathKey));
-    nextEbenenObjects = [];
+    nextEbenenObjects = []; // wird geleert, um das Ergebnis dieser Schleife zu speichern
     aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
       aktObj = uo["unterobj"];
       uo["propAttr"] = objPropAttr(aktObj, uo["objPathKey"])  // neues Objekt-Array definieren und daraus Ebenen-Array der nächsten Ebene machen
+      console.log('uo["propAttr"]', uo["propAttr"]);
+      
       // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
       nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
       // console.log(nextObjKeys);
       if (nextObjKeys.length>0) { // falls es Unterobjekte zum aktuellen Objekt gibt
         nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
-          "objPathKey": uo.objPathKey+delim+key,
+          "objPathKey": (i === 0) ? uo.objPathKey+key : uo.objPathKey+delim+key,
           "unterobj": aktObj[key],
           "propAttr": [] // wird im nächsten Zyklus befüllt
         }) );
         nextEbenenObjects.push(...nextUnterObjects);
       }
+      i++;
     });
     objPath.push(...aktEbenenObjects);
     aktEbenenObjects = nextEbenenObjects;
@@ -172,19 +174,26 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
     if (typeof obj[el] === "object" && !obj[el][0]) { }
   });
 };
-// let path = objpath(o3);
-// console.log("o3", o3);
-// console.log("path", path);
-
-o3 = [1, [2, [5, [[7],8], 3], 9], 4];
-let flat = Array.prototype.flatcomplete(o3);
+let path = objpath(o3);
 console.log("o3", o3);
-console.log("flat", flat);
+console.log("path", path);
+// console.log("path", Array.prototype.flat(path.map(obj => obj.propAttr)));
+const paa = Array.prototype.flat(path.map(obj => obj.propAttr))
+const pka = paa.map(pk => pk.pathKey);
+// const str = "copy"+pka[5];
+console.log(paa);
+// console.log(str);
+
+
 
 
 module.exports = { objpath };
 
 // alter Code
+  // o3 = [1, [2, [5, [[7],8], 3], 9], 4];
+  // let flat = Array.prototype.flatten(o3,2);
+  // console.log("o3", o3);
+  // console.log("flat", flat);
   // let paArr = ["key", "par", 2, 0, "obj.par.key", 3];
   // let pa = new PropAttr(...paArr);
   // console.log("oa", isPrimitve({"a":2}));

@@ -6,8 +6,12 @@ const o3 = { ...o1, ...o2 };
 const delim = ";"
 
 const cloneobjpath = (obj) => {
-  const objPath = objpath(obj);
+  const objPath = objpath(obj); // Pathkeys aller Unterobjekte
+  const propAttrArr = Array.prototype.flat(path.map(obj => obj.propAttr));  // PropAttr aller(!) pathKeys
   let copy = {};
+  // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
+  const objPathKeys = propAttrArr.filter(pa => Object.isObject(pa.val) === true).map(pa => pa.pathKey); // pathKeys aller Unterobjekte
+
   objPath.forEach(uo => {
     if (Object.isObject(uo.unterobj)) {
 
@@ -15,8 +19,12 @@ const cloneobjpath = (obj) => {
 
     }
   });
-
-  // let copy = Object.assign({}, obj);
+  // Werte den Keys von unten nach oben zuordnen, Objekte auslassen
+  const primPropAttr = propAttrArr.filter(pa => Object.isObject(pa.val) === false); // pathKeys aller Primitives (hier: Nicht-Objekte)
+  primPropAttr.forEach(pa => {
+    let pathArr = pa.pathKey.split(delim);
+    copy //
+  });
   return objPath;
 }; // hier vernünftige Objectkopie tief mit Unterobjekten,  evtl. mit objpath !!!
 const clonehelper= (uo) => {
