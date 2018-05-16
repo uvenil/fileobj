@@ -35,6 +35,6 @@ let objequals = ( x, y ) => {
   return true;
 }
 
-console.log("objequals: ", objequals({ "a": 1 }, { "a": 1 }));
+console.log("- objequals -: ", objequals({ "a": 1 }, { "a": 1 }));
 
 module.exports = { objequals };

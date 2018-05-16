@@ -7,6 +7,20 @@ const o3 = { ...o1, ...o2 };
 const delim = '"]["';
 
 const cloneobjpath = (obj) => {
+  console.log("- cloneobjpath -");
+  const objPath = objpath(obj); // Pathkeys aller Unterobjekte
+  const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // PropAttr aller(!) propAttr
+  let copy = {};
+  // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
+  propAttrArr.forEach(pa => {
+    if (Object.isObject(pa.val) === true) eval('copy["' + pa.pathKey + '"] = {}')
+    else eval('copy["' + pa.pathKey + '"] = ' + pa.val);
+  });
+  objequaltests(obj, copy);
+  return objPath;
+};
+
+const cloneobjpathalt = (obj) => {
   const objPath = objpath(obj); // Pathkeys aller Unterobjekte
   const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // PropAttr aller(!) pathKeys
   let copy = {};
@@ -19,19 +33,22 @@ const cloneobjpath = (obj) => {
   // Primitive Werte den Keys von unten nach oben zuordnen, Objekte auslassen
   const primPropAttr = propAttrArr.filter(pa => Object.isObject(pa.val) === false); // pathKeys aller Primitives (hier: Nicht-Objekte)
   // console.log("primPropAttr", primPropAttr);
-  primPropAttr.forEach(pa => eval('copy["' + pa.pathKey +'"] = ' + pa.val));
-  console.log("copy",copy);
-  console.log("is: ",Object.is(obj, copy));
-  console.log("==: ",obj==copy);
+  primPropAttr.reverse().forEach(pa => eval('copy["' + pa.pathKey +'"] = ' + pa.val));
+  objequaltests(obj, copy);
+  return objPath;
+};
+const objequaltests = (obj, copy) => {
+  console.log("- objequaltests -");
+  console.log("obj", obj);
+  console.log("cop", copy);
+  console.log("is: ", Object.is(obj, copy));
+  console.log("==: ", obj == copy);
   console.log("Js: ", JSON.stringify(obj) == JSON.stringify(copy));
   let opk = objpath(obj).map(o => o.objPathKey);
   let cpk = objpath(copy).map(o => o.objPathKey);
-  
   console.log("ops: ", JSON.stringify(opk) == JSON.stringify(cpk));
-  console.log("oe: ",objequals(obj, copy));
-  
-  return objPath;
-}; // hier vernünftige Objectkopie tief mit Unterobjekten,  evtl. mit objpath !!!
+  console.log("oe: ", objequals(obj, copy));
+};
 const clonehelper= (uo) => {
   if (Object.isObject(uo.unterobj)) {
    

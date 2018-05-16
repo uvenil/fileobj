@@ -109,7 +109,7 @@ const objpath = (obj = {}, objName = "obj") => {  // liefert ein Array aller Unt
   }];
   while (aktEbenenObjects.length>0 && i<20) {
     (i === 0) ? delim = '' : delim = '"]["';
-    console.log("aktEbenenObjects.objPathKey", aktEbenenObjects.map(obj=>obj.objPathKey));
+    // console.log("aktEbenenObjects.objPathKey", aktEbenenObjects.map(obj=>obj.objPathKey));
     nextEbenenObjects = []; // wird geleert, um das Ergebnis dieser Schleife zu speichern
     aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
       aktObj = uo["unterobj"];
@@ -174,27 +174,25 @@ const keyfindAll = (obj, key) => { // liefert den ersten passenden Key oder fals
   });
 };
 let path = objpath(o3);
-console.log("o3", o3);
-console.log("path", path);
-// console.log("path", Array.prototype.flat(path.map(obj => obj.propAttr)));
-const paa = Array.prototype.flat(path.map(obj => obj.propAttr))
-const pka = paa.map(pk => pk.pathKey);
-let copy = {};
-// let copy = {"b":{"e":undefined}};
-copy.b = {};
-// copy.b.e = undefined;
-const objstr = 'copy["'+pka[5]+'"]';
-const evalstr = objstr + " = 77";
-eval(evalstr);
-// console.log(pka[5]);
-console.log("copy.b.e",copy.b.e);
-
-
-
+// console.log("o3", o3);
+// console.log("path", path);
 
 module.exports = { objpath };
 
 // alter Code
+  // console.log("path", Array.prototype.flat(path.map(obj => obj.propAttr)));
+  // const paa = Array.prototype.flat(path.map(obj => obj.propAttr))
+  // const pka = paa.map(pk => pk.pathKey);
+  // let copy = {};
+  // // let copy = {"b":{"e":undefined}};
+  // copy.b = {};
+  // // copy.b.e = undefined;
+  // const objstr = 'copy["'+pka[5]+'"]';
+  // const evalstr = objstr + " = 77";
+  // eval(evalstr);
+  // // console.log(pka[5]);
+  // console.log("copy.b.e",copy.b.e);
+
   // o3 = [1, [2, [5, [[7],8], 3], 9], 4];
   // let flat = Array.prototype.flatten(o3,2);
   // console.log("o3", o3);
