@@ -179,9 +179,15 @@ console.log("path", path);
 // console.log("path", Array.prototype.flat(path.map(obj => obj.propAttr)));
 const paa = Array.prototype.flat(path.map(obj => obj.propAttr))
 const pka = paa.map(pk => pk.pathKey);
-// const str = "copy"+pka[5];
-console.log(paa);
-// console.log(str);
+let copy = {};
+// let copy = {"b":{"e":undefined}};
+copy.b = {};
+// copy.b.e = undefined;
+const objstr = 'copy["'+pka[5]+'"]';
+const evalstr = objstr + " = 77";
+eval(evalstr);
+// console.log(pka[5]);
+console.log("copy.b.e",copy.b.e);
 
 
 
