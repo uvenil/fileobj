@@ -2,7 +2,7 @@ const o0 = { "a": 1, "b": 2 };
 const o1 = { "a": 1, "b": { "e": 5 } };
 const o2 = { "c": { "f": 5 }, "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } };
 let o3 = {...o1, ...o2};
-const delim = '"]["';
+let delim = '';
 Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   let flatArr = Array.from(nestedArr);
   while (depth-- > 0) {
@@ -83,7 +83,7 @@ class PropAttr {  // (pathKey, val, levelInd), Attribute der Property (key) eine
     this.key = pathArr[pathArr.length-1];
     this.levelInd = levelInd; // Index im Array der Keys des Objekts
     this.objLevel = pathArr.length - 1; // Ebene im Objekt (0=Objekt)
-    this.parentKey = pathArr[pathArr.length - 2];
+    this.parentKey = pathArr[pathArr.length - 2] || ""; // falls delim = "";
   }
 }
 const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von obj
@@ -108,19 +108,18 @@ const objpath = (obj = {}, objName = "obj") => {  // liefert ein Array aller Unt
     "propAttr": [] // Array mit zu berechneten PropAttr-Objekte zum Unterobjekt
   }];
   while (aktEbenenObjects.length>0 && i<20) {
+    (i === 0) ? delim = '' : delim = '"]["';
     console.log("aktEbenenObjects.objPathKey", aktEbenenObjects.map(obj=>obj.objPathKey));
     nextEbenenObjects = []; // wird geleert, um das Ergebnis dieser Schleife zu speichern
     aktEbenenObjects.forEach((uo) => { // Unterobjekte der Ebene durchlaufen
       aktObj = uo["unterobj"];
       uo["propAttr"] = objPropAttr(aktObj, uo["objPathKey"])  // neues Objekt-Array definieren und daraus Ebenen-Array der nächsten Ebene machen
-      console.log('uo["propAttr"]', uo["propAttr"]);
-      
       // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
       nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
       // console.log(nextObjKeys);
       if (nextObjKeys.length>0) { // falls es Unterobjekte zum aktuellen Objekt gibt
         nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
-          "objPathKey": (i === 0) ? uo.objPathKey+key : uo.objPathKey+delim+key,
+          "objPathKey": uo.objPathKey+delim+key,
           "unterobj": aktObj[key],
           "propAttr": [] // wird im nächsten Zyklus befüllt
         }) );
