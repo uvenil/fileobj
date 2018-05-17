@@ -40,22 +40,22 @@ Array.prototype.flat = (nestedArr = [[]]) => {
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
-class PropAttr {  // (pathKey, val, levelInd), Attribute der Property (key) eines Objekts
-  constructor(pathKey, val, levelInd) {
+class PropAttr {  // (pathKey, val, attrInd), Attribute der Property (key) eines Objekts
+  constructor(pathKey, val, attrInd) {
     this.pathKey = pathKey; // Pfad bis zum key als Objekt-eindeutiger key 
     this.val = val;
     let pathArr = pathKey.split(delim);
     this.key = pathArr[pathArr.length - 1];
-    this.levelInd = levelInd; // Index im Array der Keys des Objekts
-    this.objLevel = pathArr.length - 1; // Ebene im Objekt (0=Objekt)
     this.parentKey = pathArr[pathArr.length - 2] || ""; // falls delim = "";
+    this.attrInd = attrInd; // Index im Array der Keys des Objekts
+    this.objEbene = pathArr.length - 1; // Ebene im Objekt (0=Objekt)
   }
 }
 const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr der 1. Ebene von obj
   let i = 0;
   let keys = Object.keys(obj);
   let objKeys = keys.map((key) => {
-    // (pathKey, val, levelInd)
+    // (pathKey, val, attrInd)
     return new PropAttr(objPathKey + delim + key, obj[key], i++)
   });
   return objKeys;
@@ -103,7 +103,7 @@ const propAttrFromObj = (obj) => {  // liefert ein Array aller(!) PropAttr von o
   let objPath = objpath(obj);
   return Array.prototype.flat(objPath.map(ob => ob.propAttr));
 };
-const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) über eval, benötigt Objectpath mit delim = '"]["' 
+const objFromPropAttrAlt = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) über eval, benötigt Objectpath mit delim = '"]["' 
   const obj = {};
   // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
   propAttrArr.forEach(pa => {
@@ -112,12 +112,27 @@ const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit 
   });
   return obj;
 };
-const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath über eval, benötigt Objectpath mit delim = '"]["' 
+const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) ohne eval
+  const obj = {};
+  let uoPropAttr = [];  // Teil-Array von propAttrArr, der sich aus des Unterobjekt bezieht
+  let startEbene = Math.min(...propAttrArr.map(pa => pa.objEbene)); // Start mit der höchsten Ebene (niedrigster Index)
+  let ebenenAttr = propAttrArr.filter(pa => pa.objEbene === startEbene).sort((a, b) => a.attrInd - b.attrInd);
+  // alle Keys im neuen Objekt in der Reihenfolge des attrInd durchlaufen
+  ebenenAttr.forEach(pa => {
+    if (Object.isObject(pa.val) === true) {
+      uoPropAttr = propAttrArr.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
+      obj[pa.key] = objFromPropAttr(uoPropAttr) // beim Objekt wird rekursiv die aktuelle Funktion aufgerufen
+    }
+    else obj[pa.key] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+  });
+  return obj;
+};
+const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath
   const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // alle(!) PropAttr
   const obj = objFromPropAttr(propAttrArr);
   return obj;
 };
-const cloneobjpath = (obj) => { // tiefe Objektkopie über eval, benötigt Objectpath mit delim = '"]["' 
+const cloneobjpath = (obj) => { // tiefe Objektkopie über eval, benötigt objectpath
   console.log("- cloneobjpath -");
   const objPath = objpath(obj); // Pathkeys aller Unterobjekte
   const copy = objFromPath(objPath);
@@ -194,7 +209,7 @@ const objequaltests = () => {
 
   console.log("o3",o3);
   let paa = propAttrFromObj(o3);
-  console.log("paa", paa);
+  // console.log("paa", paa);
   let ob = objFromPropAttr(paa);
   console.log("ob", ob);
 
