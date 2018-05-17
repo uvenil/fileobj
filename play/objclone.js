@@ -97,7 +97,8 @@ const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (untero
   }
   return objPath;
 };
-// ToDo: Subobjekt nach oben holen und in Excel darstellen!!!
+// ToDo: abgespeckte Version von PropAttr ohne Ebene und Ind, nur pathKey und val
+// Subobjekt nach oben holen und in Excel darstellen!!!
 // gute Funktionen in Module zusammenfassen
 const propAttrFromObj = (obj) => {  // liefert ein Array aller(!) PropAttr von obj
   let objPath = objpath(obj);
@@ -112,27 +113,32 @@ const objFromPropAttrAlt = (propAttrArr) => { // tiefer Objektaufbau vom Array m
   });
   return obj;
 };
-const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) ohne eval
+const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) ohne eval mit delim = '"]["'
   const obj = {};
+  let key;  // aktueller key des Attributs
+  let pathArr;  // in Array aufgeteilter key-Pfad
   let uoPropAttr = [];  // Teil-Array von propAttrArr, der sich aus des Unterobjekt bezieht
   let startEbene = Math.min(...propAttrArr.map(pa => pa.objEbene)); // Start mit der höchsten Ebene (niedrigster Index)
   let ebenenAttr = propAttrArr.filter(pa => pa.objEbene === startEbene).sort((a, b) => a.attrInd - b.attrInd);
   // alle Keys im neuen Objekt in der Reihenfolge des attrInd durchlaufen
   ebenenAttr.forEach(pa => {
+    pathArr = pa.pathKey.split(delim);
+    key = pathArr[pathArr.length - 1];
     if (Object.isObject(pa.val) === true) {
       uoPropAttr = propAttrArr.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
-      obj[pa.key] = objFromPropAttr(uoPropAttr) // beim Objekt wird rekursiv die aktuelle Funktion aufgerufen
+
+      obj[key] = objFromPropAttr(uoPropAttr) // beim Objekt wird rekursiv die aktuelle Funktion aufgerufen
     }
-    else obj[pa.key] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+    else obj[key] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
   });
   return obj;
 };
-const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath
+const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath mit delim = '"]["' 
   const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // alle(!) PropAttr
   const obj = objFromPropAttr(propAttrArr);
   return obj;
 };
-const cloneobjpath = (obj) => { // tiefe Objektkopie über eval, benötigt objectpath
+const cloneobjpath = (obj) => { // tiefe Objektkopie, benötigt objectpath mit delim = '"]["' 
   console.log("- cloneobjpath -");
   const objPath = objpath(obj); // Pathkeys aller Unterobjekte
   const copy = objFromPath(objPath);
@@ -207,15 +213,16 @@ const objequaltests = () => {
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
 
-  console.log("o3",o3);
-  let paa = propAttrFromObj(o3);
-  // console.log("paa", paa);
-  let ob = objFromPropAttr(paa);
-  console.log("ob", ob);
-
-  // objequal(o3, copy);
-  // delete copy.d.g;
-  // objequal(o3, copy);
+  // console.log("o3",o3);
+  // let paa = propAttrFromObj(o3);
+  // // console.log("paa", paa);
+  // let ob = objFromPropAttr(paa);
+  // console.log("ob", ob);
+  
+  let copy = cloneobjpath(o3);
+  objequal(o3, copy);
+  delete o3.d.g;
+  objequal(o3, copy);
 };
 objequaltests();
 
