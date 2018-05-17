@@ -18,16 +18,24 @@ const objequaltests = (obj, copy) => {
   console.log("ops: ", JSON.stringify(opk) == JSON.stringify(cpk)); // ObjectPathString
   console.log("oe: ", objequals(obj, copy));
 };
+const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) über eval, benötigt Objectpath mit delim = '"]["' 
+  const obj = {};
+  // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
+  propAttrArr.forEach(pa => {
+    if (Object.isObject(pa.val) === true) eval('obj["' + pa.pathKey + '"] = {}') // beim Objekt als Wert wird ein leeres Objekt erzeugt
+    else eval('obj["' + pa.pathKey + '"] = ' + pa.val); // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+  });
+  return obj;
+};
+const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath über eval, benötigt Objectpath mit delim = '"]["' 
+  const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // alle(!) PropAttr
+  const obj = objFromPropAttr(propAttrArr);
+  return obj;
+};
 const cloneobjpath = (obj) => { // tiefe Objektkopie über eval, benötigt Objectpath mit delim = '"]["' 
   console.log("- cloneobjpath -");
   const objPath = objpath(obj); // Pathkeys aller Unterobjekte
-  const propAttrArr = Array.prototype.flat(objPath.map(obj => obj.propAttr));  // alle(!) PropAttr
-  let copy = {};
-  // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
-  propAttrArr.forEach(pa => {
-    if (Object.isObject(pa.val) === true) eval('copy["' + pa.pathKey + '"] = {}') // beim Objekt als Wert wird ein leeres Objekt erzeugt
-    else eval('copy["' + pa.pathKey + '"] = ' + pa.val); // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
-  });
+  const copy = objFromPath(objPath);
   return copy;
 };
 const clonestringify = (obj) => {  // tiefe, einfache Objektkopie, es dürfen aber keine Funktionen im Objekt enthalte sein
