@@ -1,5 +1,5 @@
-// const { objpath } = require('./subobj');
 const { objequals } = require('./objequals');
+console.log("--- objclone ---");
 
 let delim = '"]["';
 
@@ -51,7 +51,7 @@ class PropAttr {  // (pathKey, val, levelInd), Attribute der Property (key) eine
     this.parentKey = pathArr[pathArr.length - 2] || ""; // falls delim = "";
   }
 }
-const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr von obj
+const objPropAttr = (obj, objPathKey) => { // erstellt Array mit PropAttr der 1. Ebene von obj
   let i = 0;
   let keys = Object.keys(obj);
   let objKeys = keys.map((key) => {
@@ -99,7 +99,10 @@ const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (untero
 };
 // ToDo: Subobjekt nach oben holen und in Excel darstellen!!!
 // gute Funktionen in Module zusammenfassen
-
+const propAttrFromObj = (obj) => {  // liefert ein Array aller(!) PropAttr von obj
+  let objPath = objpath(obj);
+  return Array.prototype.flat(objPath.map(ob => ob.propAttr));
+};
 const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) über eval, benötigt Objectpath mit delim = '"]["' 
   const obj = {};
   // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
@@ -188,10 +191,24 @@ const objequaltests = () => {
   const o1 = { "a": 1, "b": { "e": 5 } };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
-  
-  let copy = cloneobjpath(o3);
-  objequal(o3, copy);
-  delete copy.d.g;
-  objequal(o3, copy);
+
+  console.log("o3",o3);
+  let paa = propAttrFromObj(o3);
+  console.log("paa", paa);
+  let ob = objFromPropAttr(paa);
+  console.log("ob", ob);
+
+  // objequal(o3, copy);
+  // delete copy.d.g;
+  // objequal(o3, copy);
 };
 objequaltests();
+
+module.exports = { 
+  objpath, 
+  objPropAttr, 
+  PropAttr, 
+  objFromPropAttr,
+  cloneobjpath,
+  cloneinstance  
+};
