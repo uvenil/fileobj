@@ -1,8 +1,9 @@
-const { objequals } = require('./objequals');
+const { objequals } = require('./module/objequals');
 console.log("--- objclone ---");
 
 let delim = '"]["';
 
+// Klassenmethoden (static)
 Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   let flatArr = Array.from(nestedArr);
   while (depth-- > 0) {
@@ -40,6 +41,43 @@ Array.prototype.flat = (nestedArr = [[]]) => {
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
+
+// attrPath
+const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys von obj
+  if (pathKey == "") attrPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
+  let pathObj;
+  let keys = Object.keys(obj);
+  keys.forEach(key => {
+    if (pathKey == "") delim = "";
+    else delim = delimin;
+    attrPath.push({
+      pathKey: pathKey + delim + key,
+      val: obj[key]
+    });
+    if (Object.isObject(obj[key])) {
+      attrPath = attrPathFromObj(obj[key], delimin, pathKey + delim + key, Array.from(attrPath));
+    }
+  });
+  return attrPath;
+};
+const objFromAttrPath = (attrPath, delim = '"]["') => { // 
+  const obj = {};
+  let uoAttrPath = [];
+  let ebenenAttr = attrPath.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
+  ebenenAttr.forEach(pa => {
+    if (Object.isObject(pa.val)) {
+      uoAttrPath = attrPath.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
+      uoAttrPath = uoAttrPath.map(pa => ({
+        pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
+        val: pa.val
+      }));
+      obj[pa.pathKey] = objFromAttrPath(uoAttrPath); // Objekt rekursiv zuordnen
+    } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+  });
+  return obj;
+};
+
+// PropAttr
 class PropAttr {  // (pathKey, val, attrInd), Attribute der Property (key) eines Objekts
   constructor(pathKey, val, attrInd) {
     this.pathKey = pathKey; // Pfad bis zum key als Objekt-eindeutiger key 
@@ -97,47 +135,13 @@ const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (untero
   }
   return objPath;
 };
-// ToDo: abgespeckte Version von PropAttr ohne Ebene und Ind, nur pathKey und val
+// ToDo: 
 // Subobjekt nach oben holen und in Excel darstellen!!!
 // gute Funktionen in Module zusammenfassen
 const propAttrFromObj = (obj) => {  // liefert ein Array aller(!) PropAttr von obj
   let objPath = objpath(obj);
   return Array.prototype.flat(objPath.map(ob => ob.propAttr));
 };
-const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys von obj
-  if (pathKey == "") attrPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
-  let pathObj;
-  let keys = Object.keys(obj);
-  keys.forEach(key => { 
-    if (pathKey == "") delim = "";
-    else delim = delimin;
-    attrPath.push({
-      pathKey: pathKey + delim + key, 
-      val: obj[key]
-    });
-    if (Object.isObject(obj[key])) {
-      attrPath = attrPathFromObj(obj[key], delimin, pathKey + delim + key, Array.from(attrPath));
-    }
-  });
-  return attrPath;
-};
-const objFromAttrPath = (attrPath, delim = '"]["') => { // 
-  const obj = {};
-  let uoAttrPath = [];
-  let ebenenAttr = attrPath.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
-  ebenenAttr.forEach(pa => {
-    if (Object.isObject(pa.val)) {
-      uoAttrPath = attrPath.filter(upa => upa.pathKey.startsWith(pa.pathKey+delim));
-      uoAttrPath = uoAttrPath.map(pa => ({
-        pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
-        val: pa.val
-      }));
-      obj[pa.pathKey] = objFromAttrPath(uoAttrPath); // Objekt rekursiv zuordnen
-    } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
-  });
-  return obj;
-};
-
 const objFromPropAttrAlt = (propAttrArr) => { // tiefer Objektaufbau vom Array mit PropAttr (pathKey, val) über eval, benötigt Objectpath mit delim = '"]["' 
   const obj = {};
   // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
@@ -172,6 +176,8 @@ const objFromPath = (objPath) => { // tiefer Objektaufbau vom ObjectPath mit del
   const obj = objFromPropAttr(propAttrArr);
   return obj;
 };
+
+// clone
 const cloneobjpath = (obj) => { // tiefe Objektkopie, benötigt objectpath mit delim = '"]["' 
   console.log("- cloneobjpath -");
   const objPath = objpath(obj); // Pathkeys aller Unterobjekte
@@ -229,8 +235,9 @@ const cloneproto = (obj) => {  // Objekt klonen aus fs.js, Kopie ist nicht unabh
   })
   return copy;
 };
+
+// T
 const objequal = (obj, copy) => {
-  console.log("- objequaltests -");
   console.log("obj", obj);
   console.log("cop", copy);
   console.log("is: ", Object.is(obj, copy));  // immer falsch außer evtl. Identität
@@ -241,7 +248,8 @@ const objequal = (obj, copy) => {
   console.log("ops: ", JSON.stringify(opk) == JSON.stringify(cpk)); // ObjectPathString
   console.log("oe: ", objequals(obj, copy));
 };
-const objequaltests = () => {
+const objequalcheck = () => {
+  console.log("- objequalcheck -");
   const o0 = { "a": 1, "b": 2 };
   const o1 = { "a": 1, "b": { "e": 5 } };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
@@ -258,7 +266,7 @@ const objequaltests = () => {
   delete copy.d.g;
   objequal(o3, copy);
 };
-objequaltests();
+objequalcheck();
 
 module.exports = { 
   objpath, 

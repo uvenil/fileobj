@@ -1,6 +1,6 @@
 // aus: https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
 
-let objequals = ( x, y ) => {
+const objequals = ( x, y ) => {
   if ( x === y ) return true;
     // if both x and y are null or undefined and exactly the same
 

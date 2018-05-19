@@ -4,8 +4,8 @@
   const path = require('path');
   const { promisify } = require('util');
 
-  const readDir = require('./readdir');
-  const objinout = require('./objinout');
+  const readDir = require('./module/readdir');
+  const objinout = require('./module/objinout');
   const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
