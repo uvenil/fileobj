@@ -4,6 +4,21 @@ console.log("--- objclone ---");
 let delim = '"]["';
 
 // Klassenmethoden (static)
+Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
+  let flatArr = Array.from(nestedArr);
+  nestedArr.forEach(el => {
+    if (Array.isArray(el)) flatArr.splice(flatArr.indexOf(el), 1, ...el)
+  });
+  if (depth==0) { // flat complete
+    let isFlat = flatArr.findIndex(el => Array.isArray(el)) === -1;
+    if (!isFlat)  flatArr = Array.prototype.flat(flatArr, depth);
+  }
+  else if (depth-- > 1) {
+    flatArr = Array.prototype.flatrek(flatArr, depth);
+  }
+  return flatArr;
+};
+
 Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   let flatArr = Array.from(nestedArr);
   while (depth-- > 0) {
@@ -19,7 +34,7 @@ Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
   }
   return flatArr;
 };
-Array.prototype.flat = (nestedArr = [[]]) => {
+Array.prototype.flatcomplete = (nestedArr = [[]]) => {
   let i = 0;
   let flatArr = Array.from(nestedArr);
   let flat = false;
@@ -43,6 +58,21 @@ Object.prototype.isObject = (testObj) => {
 };
 
 // attrPath
+const attrPathFlatten = (attrPath, depth = 1, fromTop = true, delim = '"]["') => {
+  let flatAp = Array.from(attrPath);  // neuer Attributpath
+  while (depth-- > 0) {
+    nestedCopy = Array.from(flatArr);
+    flatArr = [];
+    nestedCopy.forEach(el => {
+      if (Array.isArray(el)) {
+        el.forEach(uel => flatArr.push(uel))
+      } else {
+        flatArr.push(el)
+      }
+    });
+  }
+  return flatArr;
+};
 const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys von obj
   if (pathKey == "") attrPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
   let pathObj;
@@ -236,8 +266,9 @@ const cloneproto = (obj) => {  // Objekt klonen aus fs.js, Kopie ist nicht unabh
   return copy;
 };
 
-// T
+// Check
 const objequal = (obj, copy) => {
+  console.log("- objequal -");
   console.log("obj", obj);
   console.log("cop", copy);
   console.log("is: ", Object.is(obj, copy));  // immer falsch außer evtl. Identität
@@ -248,8 +279,8 @@ const objequal = (obj, copy) => {
   console.log("ops: ", JSON.stringify(opk) == JSON.stringify(cpk)); // ObjectPathString
   console.log("oe: ", objequals(obj, copy));
 };
-const objequalcheck = () => {
-  console.log("- objequalcheck -");
+const check = () => {
+  console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
   const o1 = { "a": 1, "b": { "e": 5 } };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
@@ -257,16 +288,29 @@ const objequalcheck = () => {
 
   console.log("o3",o3);
   let ap = attrPathFromObj(o3);
-  let copy = objFromAttrPath(ap);
-  // console.log("ap", ap);
-  console.log("co", copy);
+  console.log("ap", ap);
+  // let copy = objFromAttrPath(ap);
+  // console.log("co", copy);
   
   // let copy = cloneobjpath(o3);
-  objequal(o3, copy);
-  delete copy.d.g;
-  objequal(o3, copy);
+  // objequal(o3, copy);
+  // delete copy.d.g;
+  // objequal(o3, copy);
 };
-objequalcheck();
+const check2 = () => {
+  console.log("- check -");
+  const a0 = [ "a", 1, "b", 2 ];
+  const a1 = [ "a", 1, "b", [ "e", 5 ] ];
+  const a2 = [ "d", [ "g", [ "i", ["j", 7] ], "h", 6 ], "e", [ "i", 8 ] ]; // "c", [ "f", 5 ],
+  const a3 = [ ...a1, ...a2 ];
+
+  console.log("a",a2);
+  
+  flat = Array.prototype.flat(a2);
+  console.log("flat",flat);
+  
+};
+check2();
 
 module.exports = { 
   objpath, 
