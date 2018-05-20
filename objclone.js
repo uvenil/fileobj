@@ -4,7 +4,7 @@ console.log("--- objclone ---");
 let delim = '"]["';
 
 // Klassenmethoden (static)
-Array.prototype.flat = (nestedArr = [[]], depth = 2) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
+Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
   let flatArr = Array.from(nestedArr);
   nestedArr.forEach(el => {
     if (Array.isArray(el)) flatArr.splice(flatArr.indexOf(el), 1, ...el)
@@ -23,7 +23,8 @@ Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 // ToDo: 
-// Subobjekt nach oben holen und in Excel darstellen!!!
+// beliebige keys zusammenführen, analog attrPathFlat !!!
+// Subobjekt nach oben holen und in Excel darstellen
 // gute Funktionen in Module zusammenfassen
 
 // attrPath
@@ -49,11 +50,11 @@ const attrPathFlat = (attrPath, depth = 0, fromTop = false, joinStr = "--", deli
     let isFlat = flatPa.findIndex(el => el.length!==1) === -1;
     if (isFlat) depth = 1;  // keine weiteren Aufrufe
   };
-  // geflattetes pathArr (flatPa) reinjizieren
+  // geflattetes pathArr (flatPa) in flatAttrPath reinjizieren
   flatPa.forEach((el, ix) => flatAttrPath[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
   return flatAttrPath;
 };
-const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys von obj
+const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys, val (attrPath) von obj
   if (pathKey == "") attrPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
   let pathObj;
   let keys = Object.keys(obj);
@@ -64,11 +65,18 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
       pathKey: pathKey + delim + key,
       val: obj[key]
     });
+    // rekursiv
     if (Object.isObject(obj[key])) {
       attrPath = attrPathFromObj(obj[key], delimin, pathKey + delim + key, Array.from(attrPath));
     }
   });
   return attrPath;
+};
+class PathKeyVal {
+  constructor(pathKey, val) {
+    this.pathKey = pathKey;
+    this.val = val;
+  }
 };
 const objFromAttrPath = (attrPath, delim = '"]["') => { // 
   const obj = {};
