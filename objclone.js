@@ -4,6 +4,78 @@ console.log("--- objclone ---");
 let delim = '"]["';
 
 // Klassenmethoden (static)
+const commonStartString = (words) => {  // words = [str1, str2, ...], 
+  // aus: https://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings, 
+  // Originalname commonSubstring; Lsg 1 (Fkt common_substring funktioniert nicht fehlerfrei)
+  var iChar, iWord,
+    refWord = words[0],
+    lRefWord = refWord.length,
+    lWords = words.length;
+  for (iChar = 0; iChar < lRefWord; iChar += 1) {
+    for (iWord = 1; iWord < lWords; iWord += 1) {
+      if (refWord[iChar] !== words[iWord][iChar]) {
+        return refWord.substring(0, iChar);
+      }
+    }
+  }
+  return refWord;
+};
+const getIntersect = (arr1, arr2) => {  // Schnittmenge zweier Arrays
+  // aus: http://www.falsepositives.com/index.php/2009/12/01/javascript-function-to-get-the-intersect-of-2-arrays/
+  var r = [], o = {}, l = arr2.length, i, v;
+  for (i = 0; i < l; i++) {
+    o[arr2[i]] = true;
+  }
+  l = arr1.length;
+  for (i = 0; i < l; i++) {
+    v = arr1[i];
+    if (v in o) {
+      r.push(v);
+    }
+  }
+  return r;
+};
+const commonString = (strArr) => {  // strArr = [str1, str2, ...],
+  // !!!commonStartString verändert für interne Strings
+  let schnittIx = schnittix(strArr[1], strArr[2]);
+  if (schnittIx.length === 0)  return "";
+
+};
+const schnittix = (str1, str2) => {  // liefert [[str1-Index, str2-Index, testLen], ...]
+  let temp = null;
+  if (str1.length > str2.length){ // str1 soll der kleinere String sein
+    temp = str1;
+    str1 = str2;
+    str2 = temp;
+  }
+  let schnittIx = [];
+  let testLen = Math.floor(str1.length/2);
+  let hits = schnittHits(str1, str2, testLen); // // [[str1-Index, str2-Index, testLen], ...]
+  // testLen schrittweise erhöhen oder erniedrigen
+  if (hits.length > 0) {
+    while (hits.length > 0 && testLen <= str1.length) {
+      schnittIx = Array.from(hits); // letzte Treffer speichern
+      hits = schnittHits(str1, str2, testLen++);
+    }
+    if (hits.length > 0) schnittIx = Array.from(hits);
+  } else {
+    while (hits.length == 0 && testLen > 1) {
+      hits = schnittHits(str1, str2, testLen--);
+    };
+    schnittIx = Array.from(hits);
+  };
+  if (temp != null) schnittIx = schnittIx.map(el => [el[1], el[0], el[2]]);  // ggf. zurücktauschen
+  return schnittIx; // [[str1-Index, str2-Index, testLen], ...]
+};
+const schnittHits = (str1, str2, testLen) => {
+  let ix1, ix2
+  let hits = []; // [[str1-Index, str2-Index, testLen], ...]
+  for (ix1 = 0; ix1 < (str1.length - testLen + 1); ix1++) {
+    ix2 = str2.indexOf(str1.slice(ix1, ix1 + testLen));
+    if (ix2 !== -1) hits.push([ix1, ix2, testLen]);
+  };
+  return hits;
+};
 Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
   let flatArr = Array.from(nestedArr);
   nestedArr.forEach(el => {
@@ -23,6 +95,7 @@ Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 // ToDo: 
+// schnittix, pkvNorm
 // beliebige keys zusammenführen, analog attrPathFlat !!!
 // Subobjekt nach oben holen und in Excel darstellen
 // gute Funktionen in Module zusammenfassen
@@ -71,6 +144,89 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
     }
   });
   return attrPath;
+};
+class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas()) 
+  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
+    if (pathKey == "") objPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
+    let pathObj;
+    let keys = Object.keys(obj);
+    keys.forEach(key => {
+      if (pathKey == "") delim = "";
+      else delim = delimin;
+      objPath.push({
+        pathKey: pathKey + delim + key,
+        val: obj[key]
+      });
+      // rekursiv
+      if (Object.isObject(obj[key])) {
+        objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+      }
+    });
+    this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
+    this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+  };
+  kasVonPkvs(delim = '"]["') {
+    return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
+  };
+  pkvsVonKas(delim = '"]["') {
+    this.kas.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
+    return this.pkvs;
+  };
+  kasFlat(depth = 0, fromTop = true, joinStr = "--") { // flatted die PathKeys des this.kas komplett (depth=0) oder um depth Ebenen
+    if (!fromTop) this.kas = this.kas.map(el => el.reverse());  // !fromTop => beide unteren Ebenen zusammenführen
+    this.kas.forEach(el => {
+      if (el.length > 1) {
+        el.splice(0, 2, fromTop ? el[0] + joinStr + el[1] : el[1] + joinStr + el[0]); // 1. und 2. Ebene zusammenführen
+      }
+      return el;
+    });
+    if (!fromTop) this.kas = this.kas.map(el => el.reverse());
+    // ggf. weitere Aufrufe von kasFlat
+    while (depth == 0 || (depth-- > 1)) { // weitere Runden, wenn nicht bereits flat
+      let isFlat = this.kas.findIndex(el => el.length !== 1) === -1;  // komplett flat?
+      if (!isFlat) this.kas = this.kasFlat(depth, fromTop, joinStr);
+      else depth = 1;  // keine weiteren Aufrufe
+    };
+    return this.kas;
+  };
+  pkvsFlat(depth = 0, fromTop = false, joinStr = "--", delim = '"]["') {
+    this.kas = this.kasVonPkvs(delim);  // zunächst kas aktualisieren und flatten
+    this.kas = this.kasFlat(depth, fromTop, joinStr);
+    this.pkvs = this.pkvsVonKas(delim);
+    return this.pkvs;
+  };
+  obj(delim = '"]["') { // erstellt zugehöriges Objekt
+    const obj = {};
+    let uoAttrPath = [];
+    let ebenenPkvs = this.pkvs.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
+    ebenenPkvs.forEach(pa => {
+      if (Object.isObject(pa.val)) {
+        uoAttrPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
+        uoAttrPath = uoAttrPath.map(pa => ({
+          pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
+          val: pa.val
+        }));
+        obj[pa.pathKey] = this.obj(delim); // Objekt rekursiv zuordnen
+      } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+    });
+    return obj;
+  };
+  subPkvs(pathKey, fromStart, delim = '"]["') {
+    if (fromStart !== true && fromStart !== false) fromStart = null;
+    switch (fromStart) {
+      case true: // pathKey am Anfang (benötigt delim)
+        return this.pkvs.filter(pkv => pkv.pathKey.startsWith(pathKey + delim));
+        break;
+      case false: // pathKey am Ende (benötigt delim)
+        return this.pkvs.filter(pkv => pkv.pathKey.endsWith(delim + pathKey));
+        break;
+      default:  // pathKey überhaupt enthalten
+        return this.pkvs.filter(pkv => pkv.pathKey.indexOf(pathKey)!==-1);
+    }
+  };
+  pkvNorm(pkvs) {
+    // !!! normieren
+  }
 };
 class PathKeyVal {
   constructor(pathKey, val) {
@@ -271,11 +427,22 @@ const check = () => {
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
 
-  console.log("o3",o3);
-  let ap = attrPathFromObj(o3);
-  console.log("ap", ap);
-  let flat = attrPathFlat(ap, 1, false, "--");
-  console.log("fl", flat);
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  console.log("op", op);
+  let pk2 = op.subPkvs("d", true);
+  console.log("pk2", pk2);
+  // let o4 = op.obj();
+  // console.log("o4",o4);
+  
+  // let kf = op.kasFlat(1,false);
+  // console.log("kf", kf);
+  // let pkvs = op.pkvsVonKas();
+  // console.log("pkvs", pkvs);
+  // let kas = op.kasVonPkvs();
+  // console.log("kas", kas);
+  // let flat = attrPathFlat(op.pkvs, 1, false, "--");
+  // console.log("fl", flat);
   
   // let copy = cloneobjpath(o3);
   // objequal(o3, copy);
@@ -295,13 +462,25 @@ const check2 = () => {
   console.log("flat",flat);
   
 };
+const check3 = () => {
+  let strArr = ["bcdefg", "bcdefg", "bcdefg", "bcde"];
+  let sub = commonString(strArr);
+  console.log(strArr);
+  console.log(sub);
+};
+const check4 = () => {
+  let s1 = "abcdebhjf";
+  let s2 = "abcdebhjf";
+  let st = schnittix(s1, s2);
+  console.log(st);
+};
 const spliceTest = () => {
   let a1 = [1, 2, 3, 4];
   console.log(a1);
   let rem = a1.splice(2, 1)
   console.log(a1, ": rem", rem);
 };
-check();
+check4();
 
 module.exports = { 
   objpath, 
