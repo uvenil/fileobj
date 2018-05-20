@@ -4,74 +4,54 @@ console.log("--- objclone ---");
 let delim = '"]["';
 
 // Klassenmethoden (static)
-Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
+Array.prototype.flat = (nestedArr = [[]], depth = 2) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
   let flatArr = Array.from(nestedArr);
   nestedArr.forEach(el => {
     if (Array.isArray(el)) flatArr.splice(flatArr.indexOf(el), 1, ...el)
   });
+  // ggf. Rekursion
   if (depth==0) { // flat complete
     let isFlat = flatArr.findIndex(el => Array.isArray(el)) === -1;
     if (!isFlat)  flatArr = Array.prototype.flat(flatArr, depth);
   }
-  else if (depth-- > 1) {
-    flatArr = Array.prototype.flatrek(flatArr, depth);
-  }
-  return flatArr;
-};
-
-Array.prototype.flatten = (nestedArr = [[]], depth = 1) => {
-  let flatArr = Array.from(nestedArr);
-  while (depth-- > 0) {
-    nestedCopy = Array.from(flatArr);
-    flatArr = [];
-    nestedCopy.forEach(el => {
-      if (Array.isArray(el)) {
-        el.forEach(uel => flatArr.push(uel))
-      } else {
-        flatArr.push(el)
-      }
-    });
-  }
-  return flatArr;
-};
-Array.prototype.flatcomplete = (nestedArr = [[]]) => {
-  let i = 0;
-  let flatArr = Array.from(nestedArr);
-  let flat = false;
-  while (!flat && i++ < 20) {
-    flat = true;
-    nestedCopy = Array.from(flatArr);
-    flatArr = [];
-    nestedCopy.forEach(el => {
-      if (Array.isArray(el)) {  // es gibt noch eine Verschachtelung
-        if (flat) flat = false;
-        el.forEach(uel => flatArr.push(uel))
-      } else {
-        flatArr.push(el)
-      }
-    });
+  else if (depth-- > 1) { // weitere flatten-Stufen
+    flatArr = Array.prototype.flat(flatArr, depth);
   }
   return flatArr;
 };
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
+// ToDo: 
+// Subobjekt nach oben holen und in Excel darstellen!!!
+// gute Funktionen in Module zusammenfassen
 
 // attrPath
-const attrPathFlatten = (attrPath, depth = 1, fromTop = true, delim = '"]["') => {
-  let flatAp = Array.from(attrPath);  // neuer Attributpath
-  while (depth-- > 0) {
-    nestedCopy = Array.from(flatArr);
-    flatArr = [];
-    nestedCopy.forEach(el => {
-      if (Array.isArray(el)) {
-        el.forEach(uel => flatArr.push(uel))
-      } else {
-        flatArr.push(el)
-      }
-    });
-  }
-  return flatArr;
+const pathArrFlat = (pathArr, fromTop = true, joinStr = "--") => { // flatted die PathKeys des PathArr um 1 Ebene
+  if (!fromTop) pathArr = pathArr.map(el => el.reverse());  // !fromTop => beide unteren Ebenen zusammenführen
+  pathArr.forEach(el => {
+    if (el.length > 1) {
+      el.splice(0, 2, fromTop ? el[0] + joinStr + el[1] : el[1] + joinStr + el[0]); // 1. und 2. Ebene zusammenführen
+    }
+    return el;
+  });
+  if (!fromTop) pathArr = pathArr.map(el => el.reverse());
+  return pathArr;
+};
+const attrPathFlat = (attrPath, depth = 0, fromTop = false, joinStr = "--", delim = '"]["') => {
+  let flatAttrPath = Array.from(attrPath);  // Kopie des übergebenen AttrPath erzeugen
+  // Extrahieren von pathArr
+  let pathArr = flatAttrPath.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem AttrPath extrahieren
+  let flatPa = pathArrFlat(pathArr, fromTop, joinStr);  // pathArr zunächst 1 Ebene flatten
+  // ggf. weitere Aufrufe von pathArrFlat
+  while (depth == 0 || (depth-- > 1)) { // flat complete
+    flatPa = pathArrFlat(pathArr, joinStr);
+    let isFlat = flatPa.findIndex(el => el.length!==1) === -1;
+    if (isFlat) depth = 1;  // keine weiteren Aufrufe
+  };
+  // geflattetes pathArr (flatPa) reinjizieren
+  flatPa.forEach((el, ix) => flatAttrPath[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
+  return flatAttrPath;
 };
 const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []) => { //  erstellt Array mit pathKeys von obj
   if (pathKey == "") attrPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
@@ -165,9 +145,6 @@ const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (untero
   }
   return objPath;
 };
-// ToDo: 
-// Subobjekt nach oben holen und in Excel darstellen!!!
-// gute Funktionen in Module zusammenfassen
 const propAttrFromObj = (obj) => {  // liefert ein Array aller(!) PropAttr von obj
   let objPath = objpath(obj);
   return Array.prototype.flat(objPath.map(ob => ob.propAttr));
@@ -289,8 +266,8 @@ const check = () => {
   console.log("o3",o3);
   let ap = attrPathFromObj(o3);
   console.log("ap", ap);
-  // let copy = objFromAttrPath(ap);
-  // console.log("co", copy);
+  let flat = attrPathFlat(ap, 1, false, "--");
+  console.log("fl", flat);
   
   // let copy = cloneobjpath(o3);
   // objequal(o3, copy);
@@ -310,7 +287,13 @@ const check2 = () => {
   console.log("flat",flat);
   
 };
-check2();
+const spliceTest = () => {
+  let a1 = [1, 2, 3, 4];
+  console.log(a1);
+  let rem = a1.splice(2, 1)
+  console.log(a1, ": rem", rem);
+};
+check();
 
 module.exports = { 
   objpath, 
