@@ -35,21 +35,18 @@ const getIntersect = (arr1, arr2) => {  // Schnittmenge zweier Arrays
   }
   return r;
 };
-const commonString = (strArr) => {  // strArr = [str1, str2, ...],
+const schnittString = (strArr) => {  // strArr = [str1, str2, ...],
   // !!!commonStartString verändert für interne Strings
-  let schnittIx = schnittix(strArr[1], strArr[2]);
-  if (schnittIx.length === 0)  return "";
-
-};
-const schnittix = (str1, str2) => {  // liefert [[str1-Index, str2-Index, testLen], ...]
+  // let schnittIx = schnittix(strArr[1], strArr[2]);
+  // if (schnittIx.length === 0)  return "";
   let temp = null;
-  if (str1.length > str2.length){ // str1 soll der kleinere String sein
+  if (str1.length > str2.length) { // str1 soll der kleinere String sein
     temp = str1;
     str1 = str2;
     str2 = temp;
   }
   let schnittIx = [];
-  let testLen = Math.floor(str1.length/2);
+  let testLen = Math.floor(str1.length / 2);
   let hits = schnittHits(str1, str2, testLen); // // [[str1-Index, str2-Index, testLen], ...]
   // testLen schrittweise erhöhen oder erniedrigen
   if (hits.length > 0) {
@@ -67,13 +64,40 @@ const schnittix = (str1, str2) => {  // liefert [[str1-Index, str2-Index, testLe
   if (temp != null) schnittIx = schnittIx.map(el => [el[1], el[0], el[2]]);  // ggf. zurücktauschen
   return schnittIx; // [[str1-Index, str2-Index, testLen], ...]
 };
-const schnittHits = (str1, str2, testLen) => {
+const schnittix = (str1, str2) => {  // liefert [] oder[[str1-Index, str2-Index, maxLen], ...]
+  let schnittIx = [];
+  let testLen = Math.floor(str1.length/2);
+  let hits = schnittHits(str1, str2, testLen); // // [[str1-Index, str2-Index, testLen], ...]
+  // testLen schrittweise erhöhen oder erniedrigen
+  if (hits.length > 0) {
+    while (hits.length > 0 && testLen <= str1.length) {
+      schnittIx = Array.from(hits); // letzte Treffer speichern
+      hits = schnittHits(str1, str2, testLen++);
+    }
+    if (hits.length > 0) schnittIx = Array.from(hits);
+  } else {
+    while (hits.length == 0 && testLen > 1) {
+      hits = schnittHits(str1, str2, testLen--);
+    };
+    schnittIx = Array.from(hits);
+  };
+  return schnittIx; // [[str1-Index, str2-Index, testLen], ...]
+};
+const schnittHits = (str1, str2, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
+  if (!testLen || testLen<0) return [];
+  let temp = null;
+  if (str1.length > str2.length) { // str1 soll der kleinere String sein
+    temp = str1;
+    str1 = str2;
+    str2 = temp;
+  }
   let ix1, ix2
   let hits = []; // [[str1-Index, str2-Index, testLen], ...]
   for (ix1 = 0; ix1 < (str1.length - testLen + 1); ix1++) {
     ix2 = str2.indexOf(str1.slice(ix1, ix1 + testLen));
     if (ix2 !== -1) hits.push([ix1, ix2, testLen]);
   };
+  if (temp != null) hits = hits.map(el => [el[1], el[0], el[2]]);  // ggf. zurücktauschen
   return hits;
 };
 Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt flatcomplete (depth = 0) und flatten
@@ -469,8 +493,8 @@ const check3 = () => {
   console.log(sub);
 };
 const check4 = () => {
-  let s1 = "abcdebhjf";
-  let s2 = "abcdebhjf";
+  let s1 = "bcebhjf";
+  let s2 = "abcdebjf";
   let st = schnittix(s1, s2);
   console.log(st);
 };
