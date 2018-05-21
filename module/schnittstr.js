@@ -1,23 +1,50 @@
 console.log("--- schnittstr.js ---");
 
+const restarr = (strArr, fromTop = true) => { // => restarr = Rest-Array = strArr ohne schnittStr
+  const { str, bOnce, testStr, testInd, foundArr } = schnittstr(strArr);
+
+  let restArrCopy = [...strArr.slice(0, testInd), ...strArr.slice(testInd + 1)];
+
+  foundInd = testStr.indexOf(str);
+  console.log("R:", restArrCopy);
+  console.log("O:",{ str, bOnce, testStr, testInd, foundInd });
+  console.log("Fo:",foundArr);
+  // Arrays herausfiltern, die sich auf den SchnittStr str beziehen
+  let filtArr = [];
+  foundArr.forEach(e1 => {
+    filtArr.push(e1.filter( e2 => foundInd === e2[0] ));
+  });
+  console.log("Fi:",filtArr);
+  let restArr = [];
+  restArrCopy.forEach((el, ix) => {
+    console.log(el);
+    const s1 = el.slice(0, filtArr[ix][0][1]);
+    const s2 = el.slice(filtArr[ix][0][1] + filtArr[ix][0][2]);
+    restArr.push(s1 + s2);
+  });
+
+  restArr = restArr.splice(testInd, 0, )
+  console.log("Fi:",filtArr);
+  console.log("Sa:",strArr);
+  console.log("R:",restArr);
+};
 const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
   let lenArr = strArr.map(el => el.length);
-  let minLenIx = lenArr.indexOf(Math.min.apply({}, lenArr));
-  let testStr = strArr[minLenIx];
+  let testInd = lenArr.indexOf(Math.min.apply({}, lenArr));
+  let testStr = strArr[testInd];
   let testLen = Math.round(testStr.length / 2);
-  let restArr = [...strArr.slice(0, minLenIx), ...strArr.slice(minLenIx+1)];
   let arr, ix;
-  let hitsArr = hitsarr(testStr, restArr, testLen); // [[str1-Index, str2-Index, maxLen]
+  let hitsArr = hitsarr(testStr, strArr, testLen); // [[str1-Index, str2-Index, maxLen]
   // testLen schrittweise erhöhen oder erniedrigen
   if (hitsArr.length > 0) {
     while (hitsArr.length > 0 && testLen++ <= testStr.length) {
       foundArr = Array.from(hitsArr); // letzte Treffer speichern
-      hitsArr = hitsarr(testStr, restArr, testLen);
+      hitsArr = hitsarr(testStr, strArr, testLen);
     }
     if (hitsArr.length > 0) foundArr = Array.from(hitsArr);
   } else {
     while (hitsArr.length == 0 && testLen-- > 0) {
-      hitsArr = hitsarr(testStr, restArr, testLen);
+      hitsArr = hitsarr(testStr, strArr, testLen);
     };
     foundArr = Array.from(hitsArr);
   };
@@ -35,7 +62,7 @@ const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmalig
   let foundInd = foundArr[0][0][0];
   let foundLen = foundArr[0][0][2];
   let str = testStr.slice(foundInd, foundInd + foundLen);
-  return { str, bOnce }; // {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
+  return { str, bOnce, testStr, testInd, foundArr }; // {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
 };
 const hitsarr = (testStr, restArr, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
   let hitsArr = [];
@@ -140,4 +167,4 @@ const spliceTest = () => {
   let rem = a1.splice(2, 1)
   console.log(a1, ": rem", rem);
 };
-module.exports = {schnittstr};
+module.exports = { schnittstr, restarr };

@@ -1,5 +1,5 @@
 const { objequals } = require('./module/objequals');
-const { schnittstr } = require('./module/schnittstr');
+const { schnittstr, restarr } = require('./module/schnittstr');
 console.log("--- objclone ---");
 
 let delim = '"]["';
@@ -76,6 +76,7 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
 // gute Funktionen in Module zusammenfassen
 
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
+  // Array-Werte scheinen hier ihre enthaltenen Objekte zu verstecken!
   constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
     if (pathKey == "") objPath = []; // Ergebnis-Array Zeichen für 1. Objektebene
     let pathObj;
@@ -157,6 +158,19 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   pkvNorm(pkvs) {
     // !!! normieren
   }
+};
+const check5 = () => {
+  console.log("- check -");
+  const o0 = { "a": 1, "b": 2 };
+  const o1 = { "a": 1, "b": [{ "e": 5 },6, [1,2]] };
+  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
+  const o3 = { ...o1, ...o2 };
+
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  console.log("op", op);
+  let pk2 = op.subPkvs("d", true);
+  console.log("pk2", pk2);
 };
 class PathKeyVal {
   constructor(pathKey, val) {
@@ -396,7 +410,7 @@ const check3 = () => {
   let strArr = ["bcdefgcd", "xxcdx", "abcde", "bcdefgcde"];
   let sub = schnittstr(strArr);
   console.log(strArr);
-  console.log(sub);
+  console.log(sub.foundArr);
 };
 const check4 = () => {
   let s1 = "bcdefgcd";
@@ -404,8 +418,14 @@ const check4 = () => {
   let st = schnitthits(s1, s2, 2);
   console.log(st);
 };
+const check6 = () => {
+  let strArr = ["bcdefgcd", "decdx", "abcde", "bcdefgcde"];
+  let sub = restarr(strArr);
+  console.log(strArr);
+  console.log(sub);
+};
 
-check3();
+check6();
 
 module.exports = { 
   objpath, 
