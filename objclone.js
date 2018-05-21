@@ -127,22 +127,25 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
   obj(delim = '"]["') { // erstellt zugehöriges Objekt
+    // fkt nicht !!!
     const obj = {};
-    let uoAttrPath = [];
+    let uObjPath = [];
     let ebenenPkvs = this.pkvs.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
     ebenenPkvs.forEach(pa => {
       if (Object.isObject(pa.val)) {
-        uoAttrPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
-        uoAttrPath = uoAttrPath.map(pa => ({
+        uObjPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
+        uObjPath = uObjPath.map(pa => ({
           pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
           val: pa.val
         }));
-        obj[pa.pathKey] = this.obj(delim); // Objekt rekursiv zuordnen
+        let uOp = new ObjPath();  // neuen, leeren Unterobjekt-Path erzeugen
+        uOp.pkvs = uObjPath;  // 
+        obj[pa.pathKey] = uOp.obj(); // Objekt rekursiv zuordnen
       } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
     });
     return obj;
   };
-  subPkvs(pathKey, fromStart, delim = '"]["') {
+  subPkvs(pathKey, fromStart = null, delim = '"]["') {
     if (fromStart !== true && fromStart !== false) fromStart = null;
     switch (fromStart) {
       case true: // pathKey am Anfang (benötigt delim)
@@ -159,18 +162,23 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     // !!! normieren
   }
 };
-const check5 = () => {
+const check7 = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
-  const o1 = { "a": 1, "b": [{ "e": 5 },6, [1,2]] };
+  const o1 = { "a": 1, "b": { "e": 5 } };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
 
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op);
-  let pk2 = op.subPkvs("d", true);
-  console.log("pk2", pk2);
+  let ob = op.obj();
+  console.log("ob",ob);
+  let b2 = objFromAttrPath(op.pkvs);
+  console.log("b2",b2);
+  
+  // let pk2 = op.subPkvs("d", true);
+  // console.log("pk2", pk2);
 };
 class PathKeyVal {
   constructor(pathKey, val) {
@@ -418,6 +426,19 @@ const check4 = () => {
   let st = schnitthits(s1, s2, 2);
   console.log(st);
 };
+const check5 = () => {
+  console.log("- check -");
+  const o0 = { "a": 1, "b": 2 };
+  const o1 = { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] };
+  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
+  const o3 = { ...o1, ...o2 };
+
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  console.log("op", op);
+  let pk2 = op.subPkvs("d", true);
+  console.log("pk2", pk2);
+};
 const check6 = () => {
   let strArr = ["bcdefgcd", "decdx", "abcde", "bcdefgcde"];
   let sub = restarr(strArr, true);
@@ -425,7 +446,7 @@ const check6 = () => {
   console.log(sub);
 };
 
-check6();
+check7();
 
 module.exports = { 
   objpath, 
