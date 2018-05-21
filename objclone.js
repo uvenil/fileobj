@@ -35,55 +35,77 @@ const getIntersect = (arr1, arr2) => {  // Schnittmenge zweier Arrays
   }
   return r;
 };
-const schnittString = (strArr) => {  // strArr = [str1, str2, ...],
-  // !!!commonStartString verändert für interne Strings
-  // let schnittIx = schnittix(strArr[1], strArr[2]);
-  // if (schnittIx.length === 0)  return "";
-  let temp = null;
-  if (str1.length > str2.length) { // str1 soll der kleinere String sein
-    temp = str1;
-    str1 = str2;
-    str2 = temp;
-  }
-  let schnittIx = [];
-  let testLen = Math.floor(str1.length / 2);
-  let hits = schnittHits(str1, str2, testLen); // // [[str1-Index, str2-Index, testLen], ...]
+const schnittString = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
+  let lenArr = strArr.map(el => el.length);
+  let minLenIx = lenArr.indexOf(Math.min.apply({}, lenArr));
+  let testStr = strArr[minLenIx];
+  let testLen = Math.round(testStr.length / 2);
+  let restArr = [...strArr.slice(0, minLenIx), ...strArr.slice(minLenIx+1)];
+  let arr, ix;
+  let hitsArr = hitsarr(testStr, restArr, testLen); // [[str1-Index, str2-Index, maxLen]
   // testLen schrittweise erhöhen oder erniedrigen
-  if (hits.length > 0) {
-    while (hits.length > 0 && testLen <= str1.length) {
-      schnittIx = Array.from(hits); // letzte Treffer speichern
-      hits = schnittHits(str1, str2, testLen++);
+  if (hitsArr.length > 0) {
+    while (hitsArr.length > 0 && testLen++ <= testStr.length) {
+      foundArr = Array.from(hitsArr); // letzte Treffer speichern
+      hitsArr = hitsarr(testStr, restArr, testLen);
     }
-    if (hits.length > 0) schnittIx = Array.from(hits);
+    if (hitsArr.length > 0) foundArr = Array.from(hitsArr);
   } else {
-    while (hits.length == 0 && testLen > 1) {
-      hits = schnittHits(str1, str2, testLen--);
+    while (hitsArr.length == 0 && testLen-- > 0) {
+      hitsArr = hitsarr(testStr, restArr, testLen);
     };
-    schnittIx = Array.from(hits);
+    foundArr = Array.from(hitsArr);
   };
-  if (temp != null) schnittIx = schnittIx.map(el => [el[1], el[0], el[2]]);  // ggf. zurücktauschen
-  return schnittIx; // [[str1-Index, str2-Index, testLen], ...]
+  if (foundArr.length===0) return {str: "", bOnce: null}; // kein gemeinsamer String
+  // Test auf Einzigartigkeit in jedem String
+  let bOnce = true;
+  foundArr.forEach(e1 => {
+    if (e1.length === 1) return;
+    let testIx = e1[0][0];  // erster Index darf für Einzigartigkeit nicht noch einmal vorkommen
+    e1.slice(1).forEach(e2 => {
+      if (testIx === e2[0]) bOnce = false;
+    });
+  });
+  // Ergebnisse
+  let foundInd = foundArr[0][0][0];
+  let foundLen = foundArr[0][0][2];
+  let str = testStr.slice(foundInd, foundInd + foundLen);
+  return { str, bOnce }; // {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
 };
-const schnittix = (str1, str2) => {  // liefert [] oder[[str1-Index, str2-Index, maxLen], ...]
+const schnittix = (str1, str2) => {  // liefert [] oder [[str1-Index, str2-Index, maxLen], ...]
   let schnittIx = [];
   let testLen = Math.floor(str1.length/2);
   let hits = schnittHits(str1, str2, testLen); // // [[str1-Index, str2-Index, testLen], ...]
   // testLen schrittweise erhöhen oder erniedrigen
   if (hits.length > 0) {
-    while (hits.length > 0 && testLen <= str1.length) {
+    while (hits.length > 0 && testLen++ <= str1.length) {
       schnittIx = Array.from(hits); // letzte Treffer speichern
-      hits = schnittHits(str1, str2, testLen++);
+      hits = schnittHits(str1, str2, testLen);
     }
     if (hits.length > 0) schnittIx = Array.from(hits);
   } else {
-    while (hits.length == 0 && testLen > 1) {
-      hits = schnittHits(str1, str2, testLen--);
+    while (hits.length == 0 && testLen-- > 1) {
+      hits = schnittHits(str1, str2, testLen);
     };
     schnittIx = Array.from(hits);
   };
   return schnittIx; // [[str1-Index, str2-Index, testLen], ...]
 };
+const hitsarr = (testStr, restArr, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
+  let hitsArr = [];
+  for (let ixa = 0; ixa < restArr.length; ixa++) {
+    const el = restArr[ixa];
+    const hits = schnittHits(testStr, el, testLen); // [[str1-Index, str2-Index, testLen], ...]
+    if (hits.length === 0) {
+      hitsArr = [];
+      break;
+    }
+    else hitsArr.push(hits);
+  };
+  return hitsArr;
+};
 const schnittHits = (str1, str2, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
+  // findet nur den Index des ersten und letzten Fundes 
   if (!testLen || testLen<0) return [];
   let temp = null;
   if (str1.length > str2.length) { // str1 soll der kleinere String sein
@@ -91,11 +113,14 @@ const schnittHits = (str1, str2, testLen) => {  // liefert [[str1-Index, str2-In
     str1 = str2;
     str2 = temp;
   }
-  let ix1, ix2
+  let ix1, ix2, ix2l
   let hits = []; // [[str1-Index, str2-Index, testLen], ...]
   for (ix1 = 0; ix1 < (str1.length - testLen + 1); ix1++) {
     ix2 = str2.indexOf(str1.slice(ix1, ix1 + testLen));
-    if (ix2 !== -1) hits.push([ix1, ix2, testLen]);
+    if (ix2 === -1) continue;
+    hits.push([ix1, ix2, testLen]);
+    ix2l = str2.lastIndexOf(str1.slice(ix1, ix1 + testLen));
+    if (ix2l !== -1 && ix2 !== ix2l)  hits.push([ix1, ix2l, testLen]);
   };
   if (temp != null) hits = hits.map(el => [el[1], el[0], el[2]]);  // ggf. zurücktauschen
   return hits;
@@ -487,15 +512,15 @@ const check2 = () => {
   
 };
 const check3 = () => {
-  let strArr = ["bcdefg", "bcdefg", "bcdefg", "bcde"];
-  let sub = commonString(strArr);
+  let strArr = ["bcdefgcd", "xxcdx", "abcde", "bcdefgcde"];
+  let sub = schnittString(strArr);
   console.log(strArr);
   console.log(sub);
 };
 const check4 = () => {
-  let s1 = "bcebhjf";
-  let s2 = "abcdebjf";
-  let st = schnittix(s1, s2);
+  let s1 = "bcdefgcd";
+  let s2 = "xcdxx";
+  let st = schnittHits(s1, s2, 2);
   console.log(st);
 };
 const spliceTest = () => {
@@ -504,7 +529,7 @@ const spliceTest = () => {
   let rem = a1.splice(2, 1)
   console.log(a1, ": rem", rem);
 };
-check4();
+check3();
 
 module.exports = { 
   objpath, 
