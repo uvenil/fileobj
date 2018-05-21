@@ -1,32 +1,24 @@
 console.log("--- schnittstr.js ---");
 
-const restarr = (strArr, fromTop = true) => { // => restarr = Rest-Array = strArr ohne schnittStr
-  const { str, bOnce, testStr, testInd, foundArr } = schnittstr(strArr);
-
-  let restArrCopy = [...strArr.slice(0, testInd), ...strArr.slice(testInd + 1)];
-
-  foundInd = testStr.indexOf(str);
-  console.log("R:", restArrCopy);
-  console.log("O:",{ str, bOnce, testStr, testInd, foundInd });
-  console.log("Fo:",foundArr);
+const restarr = (strArr, fromTop = true) => { // Restmengenstring, => restarr = Restmengenstring-Array = strArr ohne schnittStr
+  // const { str, bOnce, testStr, testInd, foundArr } = schnittstr(strArr);
+  const schnittObj = schnittstr(strArr);
+  const foundInd = schnittObj.testStr.indexOf(schnittObj.str);
+  // console.log("O:", schnittObj);
   // Arrays herausfiltern, die sich auf den SchnittStr str beziehen
   let filtArr = [];
-  foundArr.forEach(e1 => {
+  schnittObj.foundArr.forEach(e1 => {
     filtArr.push(e1.filter( e2 => foundInd === e2[0] ));
   });
-  console.log("Fi:",filtArr);
+  // Array mit der Restmengen-Strings bilden
   let restArr = [];
-  restArrCopy.forEach((el, ix) => {
-    console.log(el);
-    const s1 = el.slice(0, filtArr[ix][0][1]);
-    const s2 = el.slice(filtArr[ix][0][1] + filtArr[ix][0][2]);
+  strArr.forEach((el, ix) => {
+    const ind = fromTop ? 0 : filtArr[ix].length -1;
+    const s1 = el.slice(0, filtArr[ix][ind][1]);  // schnittStr jeweils fromTop herausschneiden
+    const s2 = el.slice(filtArr[ix][ind][1] + filtArr[ix][ind][2]);
     restArr.push(s1 + s2);
   });
-
-  restArr = restArr.splice(testInd, 0, )
-  console.log("Fi:",filtArr);
-  console.log("Sa:",strArr);
-  console.log("R:",restArr);
+  return restArr;
 };
 const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
   let lenArr = strArr.map(el => el.length);

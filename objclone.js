@@ -420,7 +420,7 @@ const check4 = () => {
 };
 const check6 = () => {
   let strArr = ["bcdefgcd", "decdx", "abcde", "bcdefgcde"];
-  let sub = restarr(strArr);
+  let sub = restarr(strArr, true);
   console.log(strArr);
   console.log(sub);
 };
