@@ -128,6 +128,25 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
+  obj2(delim = '"]["') { // erstellt zugehöriges Objekt
+    const obj = {};
+    this.kas = this.kasVonPkvs(delim);
+    let uObjPath = [];
+    let ebenenPkvs = this.pkvs.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
+    ebenenPkvs.forEach(pa => {
+      if (Object.isObject(pa.val)) {
+        uObjPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
+        uObjPath = uObjPath.map(pa => ({
+          pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
+          val: pa.val
+        }));
+        const uOp = new ObjPath();  // neuen, leeren Unterobjekt-Path erzeugen
+        uOp.pkvs = uObjPath;  // 
+        obj[pa.pathKey] = uOp.obj(); // Objekt rekursiv zuordnen
+      } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
+    });
+    return obj;
+  };
   obj(delim = '"]["') { // erstellt zugehöriges Objekt
     const obj = {};
     this.kas = this.kasVonPkvs(delim);
@@ -171,7 +190,33 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
         });
       };
       this.kas = this.kasVonPkvs(delim);
-      let ixMin =       
+    };
+    return obj;
+  };
+  pkvObj2(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
+    if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
+      obj[pkv.pathKey] = pkv.val;
+    } else {  // pathKey enthält delim => Rekursion !!!!
+      const pKarr = pkv.pathKey.split(delim);
+      pkv.pathKey = pKarr.slice(1).join(delim);
+      obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj), pkv);
+    };
+    return obj;
+  };
+  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
+    console.log("pkv",pkv, "   Obj:",obj);
+    let key;
+    // kein delim im pathKey => direkte Zuordnung
+    if (pkv.pathKey.indexOf(delim) === -1) { 
+      key = pkv.pathKey;
+      obj[key] = pkv.val;
+    // pathKey enthält delim => Rekursion !!!!
+    } else {  
+      const pKarr = pkv.pathKey.split(delim);
+      pkv.pathKey = pKarr.slice(1).join(delim);
+      key = pKarr[0];
+      obj[key] = this.pkvObj(Object.assign({}, obj), pkv);
+      // console.log("key", key, "     pK", pkv.pathKey, "     obj", obj);
     };
     return obj;
   };
@@ -203,11 +248,13 @@ const check5 = () => {
 
   console.log("o3", o3);
   let op = new ObjPath(o3);
-  console.log("op", op);
-  let pk2 = op.subObjPath("i", false);
-  console.log("pk2", pk2.pkvs);
-  let so = pk2.obj();
+  console.log("op", op.pkvs);
+  let sp = op.subObjPath('d"]["', true);
+  console.log("sp", sp);
+  let so = sp.obj();
   console.log("so", so);
+  // let pk2 = op.pkvObj({}, op.pkvs[2]);
+  // console.log("pk2", pk2);
   
 };
 class PathKeyVal {
