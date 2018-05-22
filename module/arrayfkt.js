@@ -17,7 +17,7 @@ const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Ele
     return include;
   });
 };
-const keyArrObj = (arr, keys) => {  // erstellt aus einem Array und ein Attribut-Array ein Objekt
+const keyArrObj = (arr, keys) => {  // erstellt aus einem Array und einem Attribut-Array ein Objekt
   let obj = {};
   let i = 0;
   keys.forEach((key) => {

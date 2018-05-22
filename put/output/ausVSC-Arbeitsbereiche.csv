@@ -1,0 +1,113 @@
+Attr1 \ Attr2,keys,os
+auto_indent,["Alt-Shift-Tab"],---
+beautify,["Ctrl-B"],{"mac":{"keys":["Cmd-B"]}}
+close_goto,["Esc"],---
+close_find,["Esc"],---
+duplicate_line,["Shift-Ctrl-D"],{"mac":{"keys":["Shift-Cmd-D"]}}
+goto_line,["Ctrl-G"],{"mac":{"keys":["Cmd-G"]}}
+open_colorpicker,["Ctrl-Alt-K"],{"mac":{"keys":["Cmd-Alt-K"]}}
+open_goto,["Ctrl-P"],{"mac":{"keys":["Cmd-P"]}}
+open_goto_commands,["Ctrl-Shift-P"],{"mac":{"keys":["Cmd-Shift-P"]}}
+open_find,["Ctrl-F"],{"mac":{"keys":["Cmd-F"]}}
+open_replace,["Ctrl-R"],{"mac":{"keys":["Cmd-R"]}}
+font_size_decrease,["Shift-Ctrl-Alt-Down"],{"mac":{"keys":["Shift-Cmd-Alt-Down"]}}
+font_size_increase,["Shift-Ctrl-Alt-Up"],{"mac":{"keys":["Shift-Cmd-Alt-Up"]}}
+layout_single,["Alt-Shift-1"],{"mac":{"keys":["Alt-Cmd-1"]}}
+layout_columns_2,["Alt-Shift-2"],{"mac":{"keys":["Alt-Cmd-2"]}}
+layout_columns_3,["Alt-Shift-3"],{"mac":{"keys":["Alt-Cmd-3"]}}
+layout_columns_4,["Alt-Shift-4"],{"mac":{"keys":["Alt-Cmd-4"]}}
+layout_rows_2,["Alt-Shift-8"],{"mac":{"keys":["Alt-Shift-Cmd-2"]}}
+layout_rows_3,["Alt-Shift-9"],{"mac":{"keys":["Alt-Shift-Cmd-3"]}}
+layout_grid,["Alt-Shift-5"],{"mac":{"keys":["Alt-Cmd-5"]}}
+new_file,["Alt-N"],{"mac":{"keys":["Ctrl-N"]}}
+redo,["Ctrl-Y"-"Ctrl-Shift-Z"],{"mac":{"keys":["Cmd-Y"-"Cmd-Shift-Z"]}}
+save,["Ctrl-S"],{"mac":{"keys":["Cmd-S"]}}
+save_as,["Ctrl-Shift-S"],{"mac":{"keys":["Cmd-Shift-S"]}}
+save_all,["Ctrl-Alt-S"],{"mac":{"keys":["Cmd-Alt-S"]}}
+swap_line_down,["Ctrl-Down"],{"mac":{"keys":["Cmd-Ctrl-Down"]}}
+swap_line_up,["Ctrl-Up"],{"mac":{"keys":["Cmd-Ctrl-Up"]}}
+toggle_file_explorer,["Alt-X"],---
+undo,["Ctrl-Z"],{"mac":{"keys":["Cmd-Z"]}}
+clear_bookmarks,["Shift-Ctrl-F2"],{"mac":{"keys":["Shift-Cmd-F2"]}}
+indent,["Tab"],---
+del_char_after,["Delete"],{"mac":{"keys":["Delete"-"Ctrl-D"]}}
+del_char_before,["Backspace"-"Shift-Backspace"],{"mac":{"keys":["Backspace"-"Shift-Backspace"-"Ctrl-H"]}}
+del_group_after,["Ctrl-Delete"],{"mac":{"keys":["Alt-Delete"-"Ctrl-Alt-Backspace"]}}
+del_group_before,["Ctrl-Backspace"],{"mac":{"keys":["Alt-Backspace"]}}
+del_line_left,["Ctrl-K Ctrl-Backspace"],{"mac":{"keys":["Cmd-K Cmd-Backspace"]}}
+del_line_right,["Ctrl-K Ctrl-K"],{"mac":{"keys":["Cmd-K Cmd-K"]}}
+del_word_after,["Alt-D"],mac
+del_word_before,["Alt-Backspace"],mac
+del_wrapped_line_left,["Cmd-Backspace"],mac
+del_wrapped_line_right,["Cmd-Delete"],mac
+delete_line,["Shift-Ctrl-K"],{"mac":{"keys":["Shift-Cmd-K"]}}
+delete_to_sublime_mark,["Ctrl-K Ctrl-W"],{"mac":{"keys":["Cmd-K Cmd-W"]}}
+downcase_at_cursor,["Ctrl-K Ctrl-L"],{"mac":{"keys":["Cmd-K Cmd-L"]}}
+emmet_expand_abbreviation,["Ctrl-E"],{"mac":{"keys":["Cmd-E"]}}
+find_all_under,["Alt-F3"],---
+find_incremental,["Ctrl-I"],{"mac":{"keys":["Cmd-I"]}}
+find_incremental_reverse,["Shift-Ctrl-I"],{"mac":{"keys":["Shift-Cmd-I"]}}
+find_next,["F3"],{"mac":{"keys":["F3"]}}
+find_prev,["Shift-F3"],{"mac":{"keys":["Shift-F3"]}}
+find_under,["Ctrl-F3"],{"mac":{"keys":["Cmd-F3"]}}
+find_under_previous,["Shift-Ctrl-F3"],{"mac":{"keys":["Shift-Cmd-F3"]}}
+fold,["Alt-Up"],---
+fold_all,["Alt-Shift-Up"],---
+go_char_left,["Left"],{"mac":{"keys":["Left"-"Ctrl-B"]}}
+go_char_right,["Right"],{"mac":{"keys":["Right"-"Ctrl-F"]}}
+go_doc_end,["Ctrl-End"],{"mac":{"keys":["Cmd-Down"-"Cmd-End"-"Ctrl-Down"]}}
+go_doc_start,["Ctrl-Home"],{"mac":{"keys":["Cmd-Home"-"Cmd-Up"-"Ctrl-Up"]}}
+go_group_left,["Ctrl-Left"],{"mac":{"keys":["Alt-Left"]}}
+go_group_right,["Ctrl-Right"],{"mac":{"keys":["Alt-Right"]}}
+go_line_end,["Alt-Right"],{"mac":{"keys":["Alt-Right"-"Ctrl-E"]}}
+go_line_left,["Ctrl-Left"],{"mac":{"keys":["Cmd-Left"]}}
+go_line_right,["Ctrl-Right"],{"mac":{"keys":["Cmd-Right"]}}
+go_line_start,["Alt-Left"],{"mac":{"keys":["Alt-Left"-"Ctrl-A"]}}
+go_line_start_smart,["Home"],---
+go_page_down,["PageDown"],{"mac":{"keys":["PageDown"-"Ctrl-V"]}}
+go_page_up,["PageUp"],{"mac":{"keys":["PageUp"-"Shift-Ctrl-V"]}}
+go_subword_left,["Alt-Left"],---
+go_subword_right,["Alt-Right"],---
+go_to_bracket,["Ctrl-M"],{"mac":{"keys":["Cmd-M"]}}
+go_word_left,["Alt-B"],mac
+go_word_right,["Alt-F"],mac
+unindent,["Shift-Tab"],{"mac":{"keys":["Shift-Tab"]}}
+insert_line_after,["Ctrl-Enter"],{"mac":{"keys":["Cmd-Enter"]}}
+insert_line_before,["Shift-Ctrl-Enter"],{"mac":{"keys":["Shift-Cmd-Enter"]}}
+join_lines,["Ctrl-J"],{"mac":{"keys":["Cmd-J"]}}
+new_line_and_indent,["Enter"],---
+next_bookmark,["F2"],{"mac":{"keys":["F2"]}}
+prev_bookmark,["Shift-F2"],{"mac":{"keys":["Shift-F2"]}}
+redo_selection,["Alt-U"],{"mac":{"keys":["Shift-Ctrl-U"-"Shift-Cmd-U"]}}
+scroll_line_down,["Ctrl-Shift-Down"],{"mac":{"keys":["Cmd-Down"]}}
+scroll_line_up,["Ctrl-Shift-Up"],{"mac":{"keys":["Cmd-Up"]}}
+select_all,["Ctrl-A"],{"mac":{"keys":["Cmd-A"]}}
+select_between_brackets,["Shift-Ctrl-M"],{"mac":{"keys":["Shift-Cmd-M"]}}
+select_bookmarks,["Alt-F2"],---
+select_line,["Ctrl-L"],{"mac":{"keys":["Cmd-L"]}}
+select_lines_downward,["Shift-Alt-Down"],{"mac":{"keys":["Shift-Alt-Down"]}}
+select_lines_upward,["Shift-Alt-Up"],{"mac":{"keys":["Shift-Alt-Up"]}}
+select_next_occurrence,["Ctrl-D"],{"mac":{"keys":["Cmd-D"]}}
+select_scope,["Shift-Ctrl-Space"],{"mac":{"keys":["Shift-Cmd-Space"]}}
+select_to_sublime_mark,["Ctrl-K Ctrl-A"],{"mac":{"keys":["Cmd-K Cmd-A"]}}
+set_sublime_mark,["Ctrl-K Ctrl-Space"],{"mac":{"keys":["Cmd-K Cmd-Space"]}}
+show_in_center,["Ctrl-K Ctrl-C"],{"mac":{"keys":["Cmd-K Cmd-C"]}}
+show_completions,["Ctrl-Space"],---
+select_next_tab,["Shift-Ctrl-Alt-Right"],{"mac":{"keys":["Shift-Cmd-Alt-Right"]}}
+select_previous_tab,["Shift-Ctrl-Alt-Left"],{"mac":{"keys":["Shift-Cmd-Alt-Left"]}}
+single_selection,["Esc"],---
+single_selection_top,["Esc"],{"mac":{"keys":["Esc"]}}
+sort_lines,["F9"],{"mac":{"keys":["F9"]}}
+sort_lines_insensitive,["Ctrl-F9"],{"mac":{"keys":["Cmd-F9"]}}
+split_selection_by_line,["Shift-Ctrl-L"],{"mac":{"keys":["Shift-Cmd-L"]}}
+sublime_yank,["Ctrl-K Ctrl-Y"],{"mac":{"keys":["Cmd-K Cmd-Y"]}}
+swap_with_sublime_mark,["Ctrl-K Ctrl-X"],{"mac":{"keys":["Cmd-K Cmd-X"]}}
+toggle_bookmark,["Ctrl-F2"],{"mac":{"keys":["Cmd-F2"]}}
+toggle_comment,["Ctrl-/"],{"mac":{"keys":["Cmd-/"]}}
+toggle_overwrite,["Insert"],---
+transpose_chars,["Ctrl-T"],{"mac":{"keys":["Cmd-T"]}}
+undo_selection,["Ctrl-U"],{"mac":{"keys":["Cmd-U"]}}
+unfold,["Alt-Down"],---
+unfold_all,["Alt-Shift-Down"],---
+upcase_at_cursor,["Ctrl-K Ctrl-U"],{"mac":{"keys":["Cmd-K Cmd-U"]}}
+wrap_lines,["Alt-Q"],---

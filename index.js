@@ -6,7 +6,7 @@
 
   const readDir = require('./module/readdir');
   const objinout = require('./module/objinout');
-  const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
+  const { filterEx, filterIn, keyArrObj } = require('./module/arrayfkt');
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -79,6 +79,24 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   });
   return z.join("\r\n");
 };
+// Csv aus Json im Ordner
+const csvAusJsonFile = async (ordner = "./", zuerstZ = true) => { // csv-Dateien erstellen aus json-Dateien aus Ordner oder Array mit Dateipfaden
+  let jsonArr = await jsonArrAusOrdner(ordner);
+  let csvArr = jsonArr.map(el => csvAusJson(el, zuerstZ));
+  if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
+  console.log(csvArr);
+  
+  let fileName = ordner.split("/")[ordner.split("/").length-1];
+  await fs.writeJson(path.join(resPath, 'aus' + fileName + '.json'), jsonArr[1]);
+  await fs.writeFile(path.join(resPath, 'aus' + fileName + '.csv'), csvArr[1]); // csv-Datei speichern
+  return;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
+};
+const jsonArrAusOrdner = async (ordner = "./") => { // erzeugt Array aus json-Objekten von den json-Dateien eines Ordners
+  let fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
+  let indArr = fileList.map((el) => el.replace(ordner, ""));  // Array mit relativen Dateipfaden wird zu den keys
+  let jsonArr = await readJsonArr(fileList); // Array aus Json-Objekten
+  return jsonArr;
+};
 const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   let jsonObj = await jsonAusOrdner(ordner);
   let csvObj = csvAusJson(jsonObj, zuerstZeile); // csv erzeugen
@@ -91,13 +109,20 @@ const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mi
   await fs.writeFile(path.join(resPath, 'inoutObj.csv'), csvInout); // csv-Datei speichern
   return inoutObj;
 };
-main().then((result) => {
+csvAusJsonFile("/home/micha/Schreibtisch/VSC-Arbeitsbereiche", false).then((result) => {
   // console.log(Object.keys(objObj));
   // console.log(result);
   console.log('Erfolg!');
 }).catch((error) => {
   console.error('error', error);
 });
+// main("/home/micha/Schreibtisch/VSC-Arbeitsbereiche").then((result) => {
+//   // console.log(Object.keys(objObj));
+//   // console.log(result);
+//   console.log('Erfolg!');
+// }).catch((error) => {
+//   console.error('error', error);
+// });
 // Testcode
   // const csv = async () => { // wird nicht verwendet
   //   let json = await fs.readJson('./result/inoutObj.json');
