@@ -70,7 +70,7 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
   return attrPath;
 };
 // ToDo: 
-// schnittix, pkvNorm
+// pkvNorm
 // beliebige keys zusammenführen, analog attrPathFlat !!!
 // nach Attributarr sortieren
 // Subobjekt nach oben holen und in Excel darstellen
@@ -78,7 +78,7 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
 
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Array-Werte scheinen hier ihre enthaltenen Objekte zu verstecken!
-  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
+  constructor2(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
     if (pathKey == "") objPath = []; // Ergebnis-Array,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
     let keys = Object.keys(obj);
     keys.forEach(key => {
@@ -91,6 +91,28 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       // rekursiv
       if (Object.isObject(obj[key])) {
         objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+      }
+    });
+    // pkvs ist das ObjPath-konstituierende Attribut
+    // Indices von pkvs und kas korrespondieren
+    this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
+    this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+  };
+  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
+    // Wie umgehen mit Array-Objekten? !!!!
+    if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
+    let keys = Object.keys(obj);
+    keys.forEach(key => {
+      if (pathKey == "") delim = "";  // 1. Ebene
+      else delim = delimin;
+      // rekursiv
+      if (Object.isObject(obj[key])) {
+        objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+      } else {
+        objPath.push({
+          pathKey: pathKey + delim + key,
+          val: obj[key]
+        });
       }
     });
     // pkvs ist das ObjPath-konstituierende Attribut
@@ -128,88 +150,20 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
-  obj2(delim = '"]["') { // erstellt zugehöriges Objekt
-    // Problem: wenn kein pathKey delim enthält, ist ebenenPkvs leer -> leeres Objekt
-    const obj = {};
-    this.kas = this.kasVonPkvs(delim);
-    let uObjPath = [];
-    let ebenenPkvs = this.pkvs.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
-    ebenenPkvs.forEach(pa => {
-      if (Object.isObject(pa.val)) {
-        uObjPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
-        uObjPath = uObjPath.map(pa => ({
-          pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
-          val: pa.val
-        }));
-        const uOp = new ObjPath();  // neuen, leeren Unterobjekt-Path erzeugen
-        uOp.pkvs = uObjPath;  // 
-        obj[pa.pathKey] = uOp.obj(); // Objekt rekursiv zuordnen
-      } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
-    });
-    return obj;
-  };
-  obj3(delim = '"]["') { // erstellt zugehöriges Objekt
-    const obj = {};
-    this.kas = this.kasVonPkvs(delim);
-    let uObjPath = [];
-    let ebenenPkvs = this.pkvs.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
-    if (ebenenPkvs.length > 0) {
-      ebenenPkvs.forEach(pa => {
-        if (Object.isObject(pa.val)) {
-          uObjPath = this.pkvs.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
-          uObjPath = uObjPath.map(pa => ({
-            pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
-            val: pa.val
-          }));
-          const uOp = new ObjPath();  // neuen, leeren Unterobjekt-Path erzeugen
-          uOp.pkvs = uObjPath;  // 
-          obj[pa.pathKey] = uOp.obj(); // Objekt rekursiv zuordnen
-        } else obj[pa.pathKey] = pa.val; // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
-      });
-    } else {
-      let pkvsCopy = Array.from(this.pkvs);
-      let o;
-      // solange noch ein gefüllter keyArray im kas ist
-      while (this.kas.indexOf(el => el.length > 0) !== -1) {
-        let lenArr = this.kas.map(el => el.length);
-        let minLen = Math.min.apply({}, lenArr.filter(el => el!==0));
-        for (let i = 0; i < this.pkvs.length; i++) {
-          if (this.kas[i].length !== minLen)  continue;
-          // aktuellen keyArray durchlaufen
-          for (let j = 0; j < this.kas[i].length - 1; j++) {
-            // !!! hier Objektzuordnung
-            o = JSON.parse(JSON.stringify(obj));
-            o[this.kas[i][j]] = {};
-            o = o[this.kas[i][j]];
-          }
-          o[this.kas[i][this.kas[i].length - 1]] = this.pkvs[i].val;
-          this.kas[i] = [];  // Zeichen das pathKey abgearbeitet wurde
-
-        }
-        this.pkvs.forEach(el => {
-          
-        });
-      };
-      this.kas = this.kasVonPkvs(delim);
-    };
-    return obj;
-  };
   obj(delim = '"]["') { // erstellt zugehöriges Objekt
-    let obj = {};
-    const pkvsPrim = this.pkvs.filter(el => !Object.isObject(el.val));
     // Es reichen die pkv mit primitiven values!
-    console.log("pkvsPrim", pkvsPrim);
-    pkvsPrim.forEach(pkv => {
-      obj = this.pkvObj(obj, pkv);
-    });
+    // const pkvsPrim = this.pkvs.filter(el => !Object.isObject(el.val));
+    // console.log("pkvsPrim", pkvsPrim);
+    // pkvsPrim.forEach(pkv => obj = this.pkvObj(obj, pkv));
+    let obj = {};
+    this.pkvs.forEach(pkv => obj = this.pkvObj(obj, pkv));
     return obj;
-
   };
   pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
     // Problem: Einige pkvs ergeben das gleiche pkvObj -> pkvs = redundant?
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
-    } else {  // pathKey enthält delim => Rekursion !!!!
+    } else {  // pathKey enthält delim => Rekursion
       const pKarr = pkv.pathKey.split(delim);
       pkv.pathKey = pKarr.slice(1).join(delim);
       obj[pKarr[0]] = obj[pKarr[0]] || {};
