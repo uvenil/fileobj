@@ -82,7 +82,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     if (pathKey == "") objPath = []; // Ergebnis-Array,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
     let keys = Object.keys(obj);
     keys.forEach(key => {
-      if (pathKey == "") delim = "";
+      if (pathKey == "") delim = "";  // 1. Ebene
       else delim = delimin;
       objPath.push({
         pathKey: pathKey + delim + key,
@@ -129,6 +129,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
   obj2(delim = '"]["') { // erstellt zugehöriges Objekt
+    // Problem: wenn kein pathKey delim enthält, ist ebenenPkvs leer -> leeres Objekt
     const obj = {};
     this.kas = this.kasVonPkvs(delim);
     let uObjPath = [];
@@ -147,7 +148,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     });
     return obj;
   };
-  obj(delim = '"]["') { // erstellt zugehöriges Objekt
+  obj3(delim = '"]["') { // erstellt zugehöriges Objekt
     const obj = {};
     this.kas = this.kasVonPkvs(delim);
     let uObjPath = [];
@@ -193,30 +194,26 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     };
     return obj;
   };
-  pkvObj2(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
+  obj(delim = '"]["') { // erstellt zugehöriges Objekt
+    let obj = {};
+    const pkvsPrim = this.pkvs.filter(el => !Object.isObject(el.val));
+    // Es reichen die pkv mit primitiven values!
+    console.log("pkvsPrim", pkvsPrim);
+    pkvsPrim.forEach(pkv => {
+      obj = this.pkvObj(obj, pkv);
+    });
+    return obj;
+
+  };
+  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
+    // Problem: Einige pkvs ergeben das gleiche pkvObj -> pkvs = redundant?
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
     } else {  // pathKey enthält delim => Rekursion !!!!
       const pKarr = pkv.pathKey.split(delim);
       pkv.pathKey = pKarr.slice(1).join(delim);
-      obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj), pkv);
-    };
-    return obj;
-  };
-  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
-    console.log("pkv",pkv, "   Obj:",obj);
-    let key;
-    // kein delim im pathKey => direkte Zuordnung
-    if (pkv.pathKey.indexOf(delim) === -1) { 
-      key = pkv.pathKey;
-      obj[key] = pkv.val;
-    // pathKey enthält delim => Rekursion !!!!
-    } else {  
-      const pKarr = pkv.pathKey.split(delim);
-      pkv.pathKey = pKarr.slice(1).join(delim);
-      key = pKarr[0];
-      obj[key] = this.pkvObj(Object.assign({}, obj), pkv);
-      // console.log("key", key, "     pK", pkv.pathKey, "     obj", obj);
+      obj[pKarr[0]] = obj[pKarr[0]] || {};
+      obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkv);
     };
     return obj;
   };
@@ -249,13 +246,12 @@ const check5 = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op.pkvs);
-  let sp = op.subObjPath('d"]["', true);
+  let sp = op.subObjPath('i');
   console.log("sp", sp);
   let so = sp.obj();
   console.log("so", so);
-  // let pk2 = op.pkvObj({}, op.pkvs[2]);
+  // let pk2 = op.pkvObj({}, op.pkvs[7]);
   // console.log("pk2", pk2);
-  
 };
 class PathKeyVal {
   constructor(pathKey, val) {
