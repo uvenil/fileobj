@@ -14,9 +14,9 @@ const filterEx = (filtArr, exclArr, regExpr = false) => {  // verwirft Pfade, in
   // console.log("fil", filtered);
   return filtered
 };
-const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
+const filterIn = (filtArr, inclArr, regExpr = false) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
   if (!inclArr.length>0)  return filtArr;
-  if (inclArr.indexOf(el => el.length > 0) === -1) return filtArr;
+  if (inclArr.filter(el => (el.length > 0)).length === 0) return filtArr; // keine inclArr-Elemente mit length > 0
   let filtered = [...filtArr].filter((el) => {
     let include = false;
     inclArr.forEach((suchEl) => {
