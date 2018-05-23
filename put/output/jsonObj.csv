@@ -1,1 +1,11 @@
-Attr2 \ Attr1
+Attr2 \ Attr1,/home/micha/Schreibtisch/werkma/fileobj/package.json,/home/micha/Schreibtisch/werkma/fileobj/n-8-16-heroku/package.json,/home/micha/Schreibtisch/werkma/fileobj/r-15-13-expense-summary/package.json
+name,fileobj,node-todo-api,expensify
+version,1.0.1,1.0.0,1.0.0
+description,---,---,---
+main,index.js,index.js,index.js
+scripts,{"test":"echo \"Error: no test specified\" && exit 1"},{"start":"node server/server.js"-"test":"export NODE_ENV=test || SET NODE_ENV=test && mocha server/**/*.test.js"-"test-watch":"nodemon --exec 'npm test'"},{"build:dev":"webpack"-"build:prod":"webpack -p --env production"-"dev-server":"webpack-dev-server"-"test":"jest --config=jest.config.json"-"start":"node server/server.js"-"heroku-postbuild":"yarn run build:prod"}
+author,uvenil,---,Andrew Mead
+license,MIT,ISC,MIT
+dependencies,{"fs-extra":"^6.0.0"},{"bcryptjs":"^2.3.0"-"body-parser":"^1.15.2"-"crypto-js":"^3.1.6"-"express":"^4.14.0"-"jsonwebtoken":"^7.1.9"-"lodash":"^4.15.0"-"mongodb":"^2.2.5"-"mongoose":"^4.5.9"-"validator":"^5.6.0"},{"babel-cli":"6.24.1"-"babel-core":"6.25.0"-"babel-loader":"7.1.1"-"babel-plugin-transform-class-properties":"6.24.1"-"babel-plugin-transform-object-rest-spread":"6.23.0"-"babel-preset-env":"1.5.2"-"babel-preset-react":"6.24.1"-"css-loader":"0.28.4"-"express":"4.15.4"-"extract-text-webpack-plugin":"3.0.0"-"moment":"2.18.1"-"node-sass":"4.5.3"-"normalize.css":"7.0.0"-"numeral":"2.0.6"-"react":"15.6.1"-"react-addons-shallow-compare":"15.6.0"-"react-dates":"12.3.0"-"react-dom":"15.6.1"-"react-modal":"2.2.2"-"react-redux":"5.0.5"-"react-router-dom":"4.1.2"-"redux":"3.7.2"-"sass-loader":"6.0.6"-"style-loader":"0.18.2"-"uuid":"3.1.0"-"validator":"8.0.0"-"webpack":"3.1.0"}
+engines,---,{"node":"6.2.2"},---
+devDependencies,---,{"expect":"^1.20.2"-"mocha":"^3.0.2"-"nodemon":"^1.10.2"-"supertest":"^2.0.0"},{"enzyme":"2.9.1"-"enzyme-to-json":"1.5.1"-"jest":"20.0.4"-"react-test-renderer":"15.6.1"-"webpack-dev-server":"2.5.1"}

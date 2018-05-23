@@ -3,7 +3,7 @@ const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Elemen
   return [...filtArr].filter((el) => {
     let exclude = false;
     exclArr.forEach((suchEl) => {
-      if (!exclude && el.search(suchEl) > -1) exclude = true;
+      if (!exclude) exclude = el.search(suchEl) > -1;
     });
     return !exclude;
   });
