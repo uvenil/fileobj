@@ -1,21 +1,29 @@
 'use strict'
 const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
-  return [...filtArr].filter((el) => {
+  let filtered = [...filtArr].filter((el) => {
     let exclude = false;
     exclArr.forEach((suchEl) => {
-      if (!exclude) exclude = el.search(suchEl) > -1;
+      if (suchEl==="") return;  // "" wird ignoriert
+      // console.log(el.search(suchEl) > -1);  // RegExpr
+      // console.log(el.indexOf(suchEl) > -1); // Str
+      if (!exclude) exclude = el.indexOf(suchEl) > -1;
     });
     return !exclude;
   });
+  // console.log("fil", filtered);
+  return filtered
 };
 const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
-  return [...filtArr].filter((el) => {
+  if (!inclArr.length>0)  return filtArr;
+  let filtered = [...filtArr].filter((el) => {
     let include = false;
     inclArr.forEach((suchEl) => {
-      if (!include) include = el.search(suchEl) > -1; // alternativ: if (!include) include = path.basename(el) === suchEl;
+      if (suchEl === "") return;  // "" wird ignoriert
+      if (!include) include = el.indexOf(suchEl) > -1; // alternativ: if (!include) include = path.basename(el) === suchEl;
     });
     return include;
   });
+  return filtered;
 };
 const keyArrObj = (arr, keys) => {  // erstellt aus einem Array und einem Attribut-Array ein Objekt
   let obj = {};

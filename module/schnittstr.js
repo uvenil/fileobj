@@ -1,6 +1,9 @@
 console.log("--- schnittstr.js ---");
 
+// Umbenennen in reststrs !!!
 const restarr = (strArr, fromTop = true) => { // Restmengenstring, => restarr = Restmengenstring-Array = strArr ohne schnittStr
+  if (!strArr.length>0) return [];
+  if (strArr.length === 1) return strArr;
   // const { str, bOnce, testStr, testInd, foundArr } = schnittstr(strArr);
   const schnittObj = schnittstr(strArr);
   const foundInd = schnittObj.testStr.indexOf(schnittObj.str);
@@ -21,9 +24,12 @@ const restarr = (strArr, fromTop = true) => { // Restmengenstring, => restarr = 
   return restArr;
 };
 const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
+  if (!strArr.length > 0) return {str: "", bOnce: null}
+  if (strArr.length === 1) return {str: strArr[0], bOnce: true}
   let lenArr = strArr.map(el => el.length);
   let testInd = lenArr.indexOf(Math.min.apply({}, lenArr));
   let testStr = strArr[testInd];
+  // console.log("testStr",testStr);
   let testLen = Math.round(testStr.length / 2);
   let arr, ix;
   let hitsArr = hitsarr(testStr, strArr, testLen); // [[str1-Index, str2-Index, maxLen]

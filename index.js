@@ -7,6 +7,7 @@
   const readDir = require('./module/readdir');
   const objinout = require('./module/objinout');
   const { filterEx, filterIn, keyArrObj } = require('./module/arrayfkt');
+  const { schnittstr, restarr } = require('./module/schnittstr');
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -34,9 +35,57 @@ const filelist = async (ordner = ord1) => { // liest alle Dateipfade aus dem Ord
     console.log('ERROR:', err);
   }
 }
-const filelistfilter = (fileList) => {
+const filelistfilter = (fileList = [], exclPfadStrings = [], inclPfadStrings = [], filterTyp = 0, ganzWort = false, restStrings = true) => {
+  // Parameter
+  if (ganzWort !== false) ganzWort = true;  // nur ganzes Wort (Ordnername, Dateiname, Extension) vergleichen
+  if (restStrings !== true) restStrings = false;  // nur die sich unterscheidenden Strings, Fkt. restArr (Bsp.: ord/datei1, ord/datei2 => 1, 2)
+  // if (filterTyp = 0)  filterTyp = "all";  // komplette Pfade
+  // else if (filterTyp === 1) filterTyp = "dateiname inkl. extension" // path.basename 
+  // else if (filterTyp === 2) filterTyp = "dateiname ohne extension"  // path.basename - path.extension
+  // else if (filterTyp === 3) filterTyp = "extension" // path.extension
+  // else if (filterTyp === 4) filterTyp = "pfad"  // path.dirname, irgendein Ordner oder Ordnerfolge
+  // else if (filterTyp === 5) filterTyp = "obersterordner"  // path.dirname().split(path.sep)[0]
+  // else if (filterTyp === 6) filterTyp = "untersterordner"  // path.dirname().split(path.sep)[len-1]
+  // else if (filterTyp === 7) filterTyp = "mittelordner"  // path.dirname().split(path.sep).slice(1,len-1)
 
+  // Variablen
+  let startList;
+  if (filterTyp === 0) startList = [...fileList];  // unterschiedliche komplette Pfade
+  else if (filterTyp === 1) startList = [...fileList].map(el => path.basename(el));// "dateiname inkl. extension" path.basename 
+  else if (filterTyp === 2) startList = [...fileList].map(el => restarr([path.basename(el), path.extname(el)])[0]);// "dateiname ohne extension"  // path.basename - path.extension
+  else if (filterTyp === 3) startList = [...fileList].map(el => path.extname(el));// "extension" path.extname
+  else if (filterTyp === 4) startList = [...fileList].map(el => path.dirname(el));// "pfad"  path.dirname, irgendein Ordner oder Ordnerfolge
+  else if (filterTyp >= 5 && filterTyp<=7) { // Ordner
+    startList = [...fileList].map(el => {
+      let arr = path.dirname(el).split(path.sep);
+      if (arr[0] === "") arr = arr.slice(1);
+      let folder;
+      if (filterTyp === 5) folder = arr[arr.length-1];  // "untersterordner"  path.dirname().split(path.sep)[len-1]
+      else if (filterTyp === 6) folder = arr[0];  // "obersterordner"  path.dirname().split(path.sep)[0]
+      else if (filterTyp === 7) folder = arr.slice(1,arr.length-1).join(path.sep);  // "mittelordner"  path.dirname().split(path.sep).slice(1,len-1)
+      return folder;
+    });
+  }
+  if (restStrings !== true) startList = restarr(startList);  // nur die sich unterscheidenden Strings, Fkt. restarr (Bsp.: ord/datei1, ord/datei2 => 1, 2)
+  console.log("startList", startList);
+  // console.log("startList", restarr(startList));
+  
+  // Vergleiche
+  let filtEx = filterEx(startList, exclPfadStrings);  // hinausfiltern
+  // console.log("---filtEx", restarr(filtEx));
+  let filtIn = filterIn(filtEx, inclPfadStrings); // herausziehen
+  return filtIn;
 };
+const check1 = () => {
+  const fileList = [ord2+"/test1.txt", ord3+"/test2.json", ord4+"/muster3.json"];
+  const excl = [""];
+  const incl = [""];
+  console.log("-- fileList", fileList);
+  // console.log("fl : ", restarr(fileList));
+  const flf = filelistfilter(fileList, excl, incl, 2);
+  // console.log("flf: ", restarr(flf));
+};
+check1();
 const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipfad-Array
   let objRead = {};
   try{
@@ -141,7 +190,7 @@ const makecsvinout = (ordner = ord1) => {
   console.error('error', error);
   });
 };
-makecsvinout();
+// makecsvinout();
 // Testcode
   // const csv = async () => { // wird nicht verwendet
   //   let json = await fs.readJson('./result/inoutObj.json');
