@@ -71,6 +71,7 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
 };
 // ToDo: 
 // pkvNorm
+// Test: funktionieren reduzierte pkvs mit den alten Methoden?
 // beliebige keys zusammenführen, analog attrPathFlat !!!
 // nach Attributarr sortieren
 // Subobjekt nach oben holen und in Excel darstellen

@@ -84,8 +84,6 @@ const csvAusJsonFile = async (ordner = "./", zuerstZ = true) => { // csv-Dateien
   let jsonArr = await jsonArrAusOrdner(ordner);
   let csvArr = jsonArr.map(el => csvAusJson(el, zuerstZ));
   if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
-  console.log(csvArr);
-  
   let fileName = ordner.split("/")[ordner.split("/").length-1];
   await fs.writeJson(path.join(resPath, 'aus' + fileName + '.json'), jsonArr[1]);
   await fs.writeFile(path.join(resPath, 'aus' + fileName + '.csv'), csvArr[1]); // csv-Datei speichern
@@ -94,6 +92,8 @@ const csvAusJsonFile = async (ordner = "./", zuerstZ = true) => { // csv-Dateien
 const jsonArrAusOrdner = async (ordner = "./") => { // erzeugt Array aus json-Objekten von den json-Dateien eines Ordners
   let fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
   let indArr = fileList.map((el) => el.replace(ordner, ""));  // Array mit relativen Dateipfaden wird zu den keys
+  console.log(indArr);
+  
   let jsonArr = await readJsonArr(fileList); // Array aus Json-Objekten
   return jsonArr;
 };
@@ -112,9 +112,9 @@ const main = async (ordner = ord) => {  // äußere Attribute vom Json-Objekt mi
 csvAusJsonFile("/home/micha/Schreibtisch/VSC-Arbeitsbereiche", false).then((result) => {
   // console.log(Object.keys(objObj));
   // console.log(result);
-  console.log('Erfolg!');
+  console.log('csv_Datei erstellt!');
 }).catch((error) => {
-  console.error('error', error);
+  console.error('csvAusJsonFile-Error: ', error);
 });
 // main("/home/micha/Schreibtisch/VSC-Arbeitsbereiche").then((result) => {
 //   // console.log(Object.keys(objObj));
