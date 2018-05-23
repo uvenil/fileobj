@@ -102,12 +102,13 @@ const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipf
     console.error('error', error);
   }
 };
-const jsonAusOrdner = async (ordner = ord1) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
+const jsonAusOrdner = async (ordner = ord1, bArray = true) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
   let fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
   // console.log("fileList",fileList);
   let filteredList = filelistfilter(fileList, exclPfadStrings, inclPfadStrings); // herausziehen
   // console.log("filtList", filteredList);
   let jsonArr = await readJsonArr(filteredList); // Array aus Json-Objekten
+  if (bArray) return {jsonArr, filteredList};
   // json-Objekt erzeugen
   // let indArr = filteredList.map((el) => el.replace(ordner+"/", ""));  // Array mit relativen Dateipfaden wird zu den keys
   let indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
@@ -141,7 +142,7 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   return z.join("\r\n");
 };
 const csvinout = async (ordner = ord1) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
-  let jsonObj = await jsonAusOrdner(ordner);
+  let jsonObj = await jsonAusOrdner(ordner, false);
   let csvObj = csvAusJson(jsonObj, zuerstZeile); // csv erzeugen
   if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
   await fs.writeJson(path.join(resPath, 'jsonObj.json'), jsonObj);
@@ -169,7 +170,7 @@ const jsonArrAusOrdner = async (ordner = "./", exclPfadStrings = [], inclPfadStr
   return jsonArr;
 };
 const csvAusJsonFile = async (ordner = "./", zuerstZ = false) => { // csv-Dateien erstellen aus json-Dateien aus Ordner oder Array mit Dateipfaden
-  let jsonArr = await jsonArrAusOrdner(ordner);
+  let { jsonArr, filteredList } = await jsonAusOrdner(ordner, true);  // true => Array
   // console.log(jsonArr);
   let csvArr = jsonArr.map(el => csvAusJson(el, zuerstZ));
   // Dateien schreiben
@@ -188,7 +189,7 @@ const makecsv = (ordner = ord4) => {
     console.error('error', error);
   });
 };
-makecsv();
+makecsvinout();
 // Testcode
   // const csv = async () => { // wird nicht verwendet
   //   let json = await fs.readJson('./result/inoutObj.json');
