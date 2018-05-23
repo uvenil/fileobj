@@ -44,8 +44,8 @@ const filelistfilter = (fileList = [], exclPfadStrings = [], inclPfadStrings = [
   // else if (filterTyp === 2) filterTyp = "dateiname ohne extension"  // path.basename - path.extension
   // else if (filterTyp === 3) filterTyp = "extension" // path.extension
   // else if (filterTyp === 4) filterTyp = "pfad"  // path.dirname, irgendein Ordner oder Ordnerfolge
-  // else if (filterTyp === 5) filterTyp = "obersterordner"  // path.dirname().split(path.sep)[0]
-  // else if (filterTyp === 6) filterTyp = "untersterordner"  // path.dirname().split(path.sep)[len-1]
+  // else if (filterTyp === 5) filterTyp = "untersterordner"  // path.dirname().split(path.sep)[len-1]
+  // else if (filterTyp === 6) filterTyp = "obersterordner"  // path.dirname().split(path.sep)[0]
   // else if (filterTyp === 7) filterTyp = "mittelordner"  // path.dirname().split(path.sep).slice(1,len-1)
 
   // Variablen
@@ -102,17 +102,20 @@ const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipf
     console.error('error', error);
   }
 };
-const jsonAusOrdner = async (ordner = ord1, bArray = true) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
-  let fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
-  // console.log("fileList",fileList);
-  let filteredList = filelistfilter(fileList, exclPfadStrings, inclPfadStrings); // herausziehen
-  // console.log("filtList", filteredList);
-  let jsonArr = await readJsonArr(filteredList); // Array aus Json-Objekten
+const jsonAusOrdner = async ( ordner = ord1, bArray = false, 
+  exclPfadStrings = [], 
+  inclPfadStrings = [], 
+  filterTyp = 0, 
+  regExpr = false, 
+  restStrings = false) => {  // bestimmte json-Dateien aus ordner und Unterordnern herauslesen 
+  // json-Array erzeugen
+  const fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
+  const filteredList = filelistfilter(fileList, exclPfadStrings, inclPfadStrings); // herausziehen
+  const jsonArr = await readJsonArr(filteredList); // Array aus Json-Objekten
   if (bArray) return {jsonArr, filteredList};
   // json-Objekt erzeugen
-  // let indArr = filteredList.map((el) => el.replace(ordner+"/", ""));  // Array mit relativen Dateipfaden wird zu den keys
-  let indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
-  let jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
+  const indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
+  const jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
   return jsonObj;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
 };
 const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschachtelten json-Objekt eine csv-Tabelle, zuerstZ -> äußere Attribute bilden die Zeile
@@ -144,11 +147,12 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
 const csvinout = async (ordner = ord1) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   let jsonObj = await jsonAusOrdner(ordner, false);
   let csvObj = csvAusJson(jsonObj, zuerstZeile); // csv erzeugen
+  let inoutObj = objinout(jsonObj); // äußere Attribute mit ineren vertauschen
+  let csvInout = csvAusJson(inoutObj, zuerstZeile); // csv erzeugen
+  // Dateien speichern
   if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
   await fs.writeJson(path.join(resPath, 'jsonObj.json'), jsonObj);
   await fs.writeFile(path.join(resPath, 'jsonObj.csv'), csvObj); // csv-Datei speichern
-  let inoutObj = objinout(jsonObj); // äußere Attribute mit ineren vertauschen
-  let csvInout = csvAusJson(inoutObj, zuerstZeile); // csv erzeugen
   await fs.writeJson(path.join(resPath, 'inoutObj.json'), inoutObj);
   await fs.writeFile(path.join(resPath, 'inoutObj.csv'), csvInout); // csv-Datei speichern
   return inoutObj;
@@ -163,22 +167,24 @@ const makecsvinout = (ordner = ord4) => {
   });
 };
 // Csv aus Json im Ordner
-const jsonArrAusOrdner = async (ordner = "./", exclPfadStrings = [], inclPfadStrings = [], filterTyp = 0) => { // erzeugt Array aus json-Objekten von den json-Dateien eines Ordners
-  const fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
-  const filteredList = filelistfilter(fileList, exclPfadStrings, inclPfadStrings); // herausziehen
-  const jsonArr = await readJsonArr(filteredList); // Array aus Json-Objekten
-  return jsonArr;
-};
 const csvAusJsonFile = async (ordner = "./", zuerstZ = false) => { // csv-Dateien erstellen aus json-Dateien aus Ordner oder Array mit Dateipfaden
   let { jsonArr, filteredList } = await jsonAusOrdner(ordner, true);  // true => Array
-  // console.log(jsonArr);
   let csvArr = jsonArr.map(el => csvAusJson(el, zuerstZ));
-  // Dateien schreiben
-  if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
-  let fileName = ordner.split("/")[ordner.split("/").length-1];
-  await fs.writeJson(path.join(resPath, 'aus' + fileName + '.json'), jsonArr[1]);
-  await fs.writeFile(path.join(resPath, 'aus' + fileName + '.csv'), csvArr[1]); // csv-Datei speichern
+  // Dateien speichern
+  await savecsvjson({ fileList: filteredList, jsonArr, csvArr, savePath: resPath });
   return;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
+};
+const savecsvjson = async ({ fileList, jsonArr, csvArr, savePath = resPath}) => {
+  if (!fs.existsSync(savePath)) fs.mkdirSync(savePath); // Ergebnispfad erzeugen
+  fileList.forEach(async (el, ix) => {
+    // let fileName = ordner.split("/")[ordner.split("/").length-1];
+    // let arr = path.dirname(el).split(path.sep);
+    // let folder = arr[arr.length - 1];
+    let fileName = path.basename(el);
+    await fs.writeJson(path.join(savePath, fileName + '.json'), jsonArr[ix]);
+    await fs.writeFile(path.join(savePath, fileName + '.csv'), csvArr[ix]); // csv-Datei speichern
+  });
+
 };
 const makecsv = (ordner = ord4) => {
   csvAusJsonFile(ordner, false).then((result) => {
@@ -189,7 +195,7 @@ const makecsv = (ordner = ord4) => {
     console.error('error', error);
   });
 };
-makecsvinout();
+makecsv();
 // Testcode
   // const csv = async () => { // wird nicht verwendet
   //   let json = await fs.readJson('./result/inoutObj.json');
