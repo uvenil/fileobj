@@ -7,7 +7,7 @@
   const readDir = require('./module/readdir');
   const objinout = require('./module/objinout');
   const { filterEx, filterIn, keyArrObj } = require('./module/arrayfkt');
-  const { schnittstr, restarr } = require('./module/schnittstr');
+  const { schnittstr, reststrs } = require('./module/schnittstr');
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -38,7 +38,7 @@ const filelist = async (ordner = ord1) => { // liest alle Dateipfade aus dem Ord
 const filelistfilter = (fileList = [], exclPfadStrings = [], inclPfadStrings = [], filterTyp = 0, regExpr = false, restStrings = false) => {
   // Parameter
   if (regExpr !== false) regExpr = true;  // nur ganzes Wort (Ordnername, Dateiname, Extension) vergleichen
-  if (restStrings !== false) restStrings = true;  // nur die sich unterscheidenden Strings, macht v.a.  Sinn bei Pfaden, Fkt. restArr (Bsp.: ord/datei1, ord/datei2 => 1, 2)
+  if (restStrings !== false) restStrings = true;  // nur die sich unterscheidenden Strings, macht v.a.  Sinn bei Pfaden, Fkt. reststrs (Bsp.: ord/datei1, ord/datei2 => 1, 2)
   // if (filterTyp = 0)  filterTyp = "all";  // komplette Pfade
   // else if (filterTyp === 1) filterTyp = "dateiname inkl. extension" // path.basename 
   // else if (filterTyp === 2) filterTyp = "dateiname ohne extension"  // path.basename - path.extension
@@ -52,7 +52,7 @@ const filelistfilter = (fileList = [], exclPfadStrings = [], inclPfadStrings = [
   let startList;
   if (filterTyp === 0) startList = [...fileList];  // unterschiedliche komplette Pfade
   else if (filterTyp === 1) startList = [...fileList].map(el => path.basename(el));// "dateiname inkl. extension" path.basename 
-  // else if (filterTyp === 2) startList = [...fileList].map(el => restarr([path.basename(el), path.extname(el)])[0]);// "dateiname ohne extension"  // path.basename - path.extension
+  // else if (filterTyp === 2) startList = [...fileList].map(el => reststrs([path.basename(el), path.extname(el)])[0]);// "dateiname ohne extension"  // path.basename - path.extension
   else if (filterTyp === 2) startList = [...fileList].map(el => path.basename(el).slice(0, path.basename(el).indexOf(path.extname(el)))); // "dateiname ohne extension"  // path.basename - path.extension
   else if (filterTyp === 3) startList = [...fileList].map(el => path.extname(el));// "extension" path.extname
   else if (filterTyp === 4) startList = [...fileList].map(el => path.dirname(el));// "pfad"  path.dirname, irgendein Ordner oder Ordnerfolge
@@ -67,14 +67,14 @@ const filelistfilter = (fileList = [], exclPfadStrings = [], inclPfadStrings = [
       return folder;
     });
   }
-  if (restStrings === true) startList = restarr(startList);  // nur die sich unterscheidenden Strings, Fkt. restarr (Bsp.: ord/datei1, ord/datei2 => 1, 2)
+  if (restStrings === true) startList = reststrs(startList);  // nur die sich unterscheidenden Strings, Fkt. reststrs (Bsp.: ord/datei1, ord/datei2 => 1, 2)
   console.log("startList", startList);
-  // console.log("startList", restarr(startList));
+  // console.log("startList", reststrs(startList));
   
   // Vergleiche
   let filtEx = filterEx(startList, exclPfadStrings, regExpr);  // hinausfiltern
   // console.log("---filtEx", filtEx);
-  // console.log("---filtEx", restarr(filtEx));
+  // console.log("---filtEx", reststrs(filtEx));
   let filtIn = filterIn(filtEx, inclPfadStrings, regExpr); // herausziehen
   return filtIn;
 };
@@ -83,9 +83,9 @@ const check1 = () => {
   const excl = ["test."];
   const incl = [""];
   // console.log("-- fileList", fileList);
-  // console.log("fl : ", restarr(fileList));
+  // console.log("fl : ", reststrs(fileList));
   const flf = filelistfilter(fileList, excl, incl, 1, true, false);
-  console.log("flf: ", restarr(flf));
+  console.log("flf: ", reststrs(flf));
 };
 check1();
 const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipfad-Array

@@ -1,7 +1,7 @@
 console.log("--- schnittstr.js ---");
 
 // Umbenennen in reststrs !!!
-const restarr = (strArr, fromTop = true) => { // Restmengenstring, => restarr = Restmengenstring-Array = strArr ohne schnittStr
+const reststrs = (strArr, fromTop = true) => { // Restmengenstring, => reststrs = Restmengenstring-Array = strArr ohne schnittStr
   if (!strArr.length>0) return [];
   if (strArr.length === 1) return strArr;
   // const { str, bOnce, testStr, testInd, foundArr } = schnittstr(strArr);
@@ -14,14 +14,14 @@ const restarr = (strArr, fromTop = true) => { // Restmengenstring, => restarr = 
     filtArr.push(e1.filter( e2 => foundInd === e2[0] ));
   });
   // Array mit der Restmengen-Strings bilden
-  let restArr = [];
+  let restStrs = [];
   strArr.forEach((el, ix) => {
     const ind = fromTop ? 0 : filtArr[ix].length -1;
     const s1 = el.slice(0, filtArr[ix][ind][1]);  // schnittStr jeweils fromTop herausschneiden
     const s2 = el.slice(filtArr[ix][ind][1] + filtArr[ix][ind][2]);
-    restArr.push(s1 + s2);
+    restStrs.push(s1 + s2);
   });
-  return restArr;
+  return restStrs;
 };
 const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
   if (!strArr.length > 0) return {str: "", bOnce: null}
@@ -62,10 +62,10 @@ const schnittstr = (strArr) => { // => {str: gemeinsamer String, bOnce: Einmalig
   let str = testStr.slice(foundInd, foundInd + foundLen);
   return { str, bOnce, testStr, testInd, foundArr }; // {str: gemeinsamer String, bOnce: Einmaligkeit in jedem String};
 };
-const hitsarr = (testStr, restArr, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
+const hitsarr = (testStr, restStrs, testLen) => {  // liefert [[str1-Index, str2-Index, testLen]
   let hitsArr = [];
-  for (let ixa = 0; ixa < restArr.length; ixa++) {
-    const el = restArr[ixa];
+  for (let ixa = 0; ixa < restStrs.length; ixa++) {
+    const el = restStrs[ixa];
     const hits = schnitthits(testStr, el, testLen); // [[str1-Index, str2-Index, testLen], ...]
     if (hits.length === 0) {
       hitsArr = [];
@@ -165,4 +165,4 @@ const spliceTest = () => {
   let rem = a1.splice(2, 1)
   console.log(a1, ": rem", rem);
 };
-module.exports = { schnittstr, restarr };
+module.exports = { schnittstr, reststrs };

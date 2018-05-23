@@ -1,5 +1,5 @@
 const { objequals } = require('./module/objequals');
-const { schnittstr, restarr } = require('./module/schnittstr');
+const { schnittstr, reststrs } = require('./module/schnittstr');
 console.log("--- objclone ---");
 
 let delim = '"]["';
@@ -456,7 +456,7 @@ const check4 = () => {
 };
 const check6 = () => {
   let strArr = ["bcdefgcd", "decdx", "abcde", "bcdefgcde"];
-  let sub = restarr(strArr, true);
+  let sub = reststrs(strArr, true);
   console.log(strArr);
   console.log(sub);
 };
