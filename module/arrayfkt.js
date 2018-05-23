@@ -1,12 +1,13 @@
 'use strict'
-const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
+const filterEx = (filtArr, exclArr, regExpr = false) => {  // verwirft Pfade, in denen ein Element aus exclArr enthalten ist
   let filtered = [...filtArr].filter((el) => {
     let exclude = false;
     exclArr.forEach((suchEl) => {
       if (suchEl==="") return;  // "" wird ignoriert
-      // console.log(el.search(suchEl) > -1);  // RegExpr
-      // console.log(el.indexOf(suchEl) > -1); // Str
-      if (!exclude) exclude = el.indexOf(suchEl) > -1;
+      if (!exclude) {
+        if (regExpr) exclude = el.search(suchEl) > -1;  // RegExpr
+        else exclude = el.indexOf(suchEl) > -1; // Str
+      }
     });
     return !exclude;
   });
@@ -15,11 +16,15 @@ const filterEx = (filtArr, exclArr) => {  // verwirft Pfade, in denen ein Elemen
 };
 const filterIn = (filtArr, inclArr) => { // zieht Pfade heraus, in denen ein Element aus inclArr enthalten ist
   if (!inclArr.length>0)  return filtArr;
+  if (inclArr.indexOf(el => el.length > 0) === -1) return filtArr;
   let filtered = [...filtArr].filter((el) => {
     let include = false;
     inclArr.forEach((suchEl) => {
       if (suchEl === "") return;  // "" wird ignoriert
-      if (!include) include = el.indexOf(suchEl) > -1; // alternativ: if (!include) include = path.basename(el) === suchEl;
+      if (!include) {
+        if (regExpr) include = el.search(suchEl) > -1; // RegExpr,  alternativ: if (!include) include = path.basename(el) === suchEl;
+        else include = el.indexOf(suchEl) > -1; // Str,  alternativ: if (!include) include = path.basename(el) === suchEl;
+      }
     });
     return include;
   });
