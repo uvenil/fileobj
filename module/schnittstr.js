@@ -1,6 +1,5 @@
 console.log("--- schnittstr.js ---");
 
-// Umbenennen in reststrs !!!
 const reststrs = (strArr, fromTop = true) => { // Restmengenstring, => reststrs = Restmengenstring-Array = strArr ohne schnittStr
   if (!strArr.length>0) return [];
   if (strArr.length === 1) return strArr;
