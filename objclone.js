@@ -186,14 +186,19 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return obj;
   };
   pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
-    // Problem: Einige pkvs ergeben das gleiche pkvObj -> pkvs = redundant?
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
     } else {  // pathKey enthält delim => Rekursion
       const pKarr = pkv.pathKey.split(delim);
       pkv.pathKey = pKarr.slice(1).join(delim);
-      obj[pKarr[0]] = obj[pKarr[0]] || {};
-      obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkv);
+      // Rekursion
+      if (pKarr[1] >= 0) {  // Key = Zahl => Array
+        obj[pKarr[0]] = obj[pKarr[0]] || []; // ggf. leeres Objekt erzeugen
+        obj[pKarr[0]] = this.pkvObj(Array.from(obj[pKarr[0]]), pkv);
+      } else {  // Key = String => Objekt
+        obj[pKarr[0]] = obj[pKarr[0]] || {}; // ggf. leeres Objekt erzeugen
+        obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkv);
+      }
     };
     return obj;
   };
@@ -226,7 +231,7 @@ const check5 = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op.pkvs);
-  let sp = op.subObjPath('2');
+  let sp = op.subObjPath('b');
   console.log("sp", sp);
   let so = sp.obj();
   console.log("so", so);
