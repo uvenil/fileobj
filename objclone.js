@@ -71,11 +71,12 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
 };
 // ToDo: 
 // pkvNorm
-// Test: funktionieren reduzierte pkvs mit den alten Methoden?
+// Test: funktionieren reduzierte pkvs mit den alten Methoden, ObjPath Typen mit/ohne Array?
 // beliebige keys zusammenführen, analog attrPathFlat !!!
 // nach Attributarr sortieren
 // Subobjekt nach oben holen und in Excel darstellen
 // gute Funktionen in Module zusammenfassen
+// npm Pakete analysieren
 
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Array-Werte scheinen hier ihre enthaltenen Objekte zu verstecken!
@@ -92,6 +93,28 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       // rekursiv
       if (Object.isObject(obj[key])) {
         objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+      }
+    });
+    // pkvs ist das ObjPath-konstituierende Attribut
+    // Indices von pkvs und kas korrespondieren
+    this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
+    this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+  };
+  constructor3(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
+    // Wie umgehen mit Array-Objekten? !!!!
+    if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
+    let keys = Object.keys(obj);
+    keys.forEach(key => {
+      if (pathKey == "") delim = "";  // 1. Ebene
+      else delim = delimin;
+      // rekursiv
+      if (Object.isObject(obj[key])) {
+        objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+      } else {
+        objPath.push({
+          pathKey: pathKey + delim + key,
+          val: obj[key]
+        });
       }
     });
     // pkvs ist das ObjPath-konstituierende Attribut
