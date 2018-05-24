@@ -122,15 +122,17 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
     this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
   };
-  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    // Wie umgehen mit Array-Objekten? !!!!
+  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
     if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
-    let keys = Object.keys(obj);
+    let keys = [];
+    if (arraySolve && Array.isArray(obj)) keys = [...obj.keys()]
+    else keys = Object.keys(obj);
+    // keys iterieren
     keys.forEach(key => {
       if (pathKey == "") delim = "";  // 1. Ebene
       else delim = delimin;
       // rekursiv
-      if (Object.isObject(obj[key])) {
+      if (Object.isObject(obj[key]) || (arraySolve && Array.isArray(obj[key]))) {
         objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
       } else {
         objPath.push({
@@ -224,7 +226,7 @@ const check5 = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op.pkvs);
-  let sp = op.subObjPath('i');
+  let sp = op.subObjPath('2');
   console.log("sp", sp);
   let so = sp.obj();
   console.log("so", so);
