@@ -113,14 +113,12 @@ const jsonAusOrdner = async ( ordner = ord1, bArray = false,
   // json-Array erzeugen
   const fileList = await filelist(ordner); // filelist = Liste mit Dateipfaden
   const filteredList = filelistfilter(fileList, exclStrings, inclStrings); // herausziehen
-  console.log("fiL", filteredList);
-  
   const jsonArr = await readJsonArr(filteredList); // Array aus Json-Objekten
-  // console.log(jsonArr);
-  
   if (bArray) return {jsonArr, filteredList};
   // json-Objekt erzeugen
-  const indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
+  const indArr = reststrs(filteredList);  // Array mit relativen Dateipfaden wird zu den keys
+  // const indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
+  // console.log("indArr",indArr);
   const jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
   return jsonObj;  // Objekt aus Json-Objekten mit relativem Dateipfad als key
 };
@@ -159,24 +157,12 @@ const savecsvjson = async ({ fileNames, jsonArr, csvArr, savePath = resPath }) =
 };
 const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclStrings = inclPfadStrings, filterTyp = 0) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   let jsonZ = await jsonAusOrdner(ordner, false, exclStrings, inclStrings, filterTyp);
-  
   let csvZ = csvAusJson(jsonZ, zuerstZeile); // csv erzeugen
   let jsonS = objinout(jsonZ); // äußere Attribute mit ineren vertauschen
   let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugen
-  let jsonArr = [].push({"a": 1});//[{...jsonZ}, jsonS]; !!!! Problem Array aus Objekten
-  // console.log(jsonZ);
-  console.log(jsonArr);
-  
   const name = inclStrings.map(el => el.replace(".","-")).join("-");
   const fileNames = [name + "_Z", name + "_S"];  // oberste Ebene in der 1. Zeile bzw.. Spalte
   await savecsvjson({ fileNames, jsonArr: [jsonZ, jsonS], csvArr: [csvZ, csvS], savePath: resPath });
-
-  // Dateien speichern
-  // if (!fs.existsSync(resPath)) fs.mkdirSync(resPath); // Ergebnispfad erzeugen
-  // await fs.writeJson(path.join(resPath, 'jsonZ.json'), jsonZ);
-  // await fs.writeFile(path.join(resPath, 'jsonZ.csv'), csvZ); // csv-Datei speichern
-  // await fs.writeJson(path.join(resPath, 'inoutObj.json'), jsonS);
-  // await fs.writeFile(path.join(resPath, 'inoutObj.csv'), csvS); // csv-Datei speichern
   return jsonS;
 };
 const makecsvinout = (ordner = ord6) => {
