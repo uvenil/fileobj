@@ -70,7 +70,6 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
   return attrPath;
 };
 // ToDo: 
-// pkvNorm
 // Test: funktionieren reduzierte pkvs mit den alten Methoden, ObjPath Typen mit/ohne Array?
 // beliebige keys zusammenführen, analog attrPathFlat !!!
 // nach Attributarr sortieren
@@ -177,12 +176,15 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
   obj(delim = '"]["') { // erstellt zugehöriges Objekt
-    // Es reichen die pkv mit primitiven values!
-    // const pkvsPrim = this.pkvs.filter(el => !Object.isObject(el.val));
-    // console.log("pkvsPrim", pkvsPrim);
-    // pkvsPrim.forEach(pkv => obj = this.pkvObj(obj, pkv));
-    let obj = {};
-    this.pkvs.forEach(pkv => obj = this.pkvObj(obj, pkv));
+    let pKarr;
+    let obj;
+    pKarr = this.pkvs[0].pathKey.split(delim);
+    if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
+    else obj = {};  // erster  Key = String => Objekt
+    // für jedes pkv das Objekt mit einem Unterobjekt ergänzen
+    this.pkvs.forEach(pkv => {
+      obj = this.pkvObj(obj, pkv);
+    });
     return obj;
   };
   pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
@@ -192,10 +194,10 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       const pKarr = pkv.pathKey.split(delim);
       pkv.pathKey = pKarr.slice(1).join(delim);
       // Rekursion
-      if (pKarr[1] >= 0) {  // Key = Zahl => Array
+      if (pKarr[1] >= 0) {  // nächster Key = Zahl => Array
         obj[pKarr[0]] = obj[pKarr[0]] || []; // ggf. leeres Objekt erzeugen
         obj[pKarr[0]] = this.pkvObj(Array.from(obj[pKarr[0]]), pkv);
-      } else {  // Key = String => Objekt
+      } else {  // nächster Key = String => Objekt
         obj[pKarr[0]] = obj[pKarr[0]] || {}; // ggf. leeres Objekt erzeugen
         obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkv);
       }
@@ -217,8 +219,19 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     }
     return subOp;
   };
-  pkvNorm(pkvs) {
-    // !!! normieren
+  subObj(pathKey, fromStart = null, delim = '"]["') { // subObjekt extrahieren
+    const subOp = this.subObjPath(pathKey, fromStart = null, delim = '"]["');
+    subOp.pkvNorm();
+    return subOp.obj();
+  };
+  pkvNorm() { // normiert die pkvs pathKeys mit reststrs
+    let pathKeys = this.pkvs.map(el => el.pathKey);
+    pathKeys = reststrs(pathKeys);
+    this.pkvs = this.pkvs.map((el, ix) => ({
+      "pathKey": pathKeys[ix],
+      "val": el.val
+    }));
+    return this.pkvs;
   }
 };
 const check5 = () => {
@@ -233,8 +246,13 @@ const check5 = () => {
   console.log("op", op.pkvs);
   let sp = op.subObjPath('b');
   console.log("sp", sp);
+  let pn = sp.pkvNorm();
+  console.log("pn", pn);
   let so = sp.obj();
   console.log("so", so);
+  let so2 = op.subObj('b');
+  console.log("so2",so2);
+  
   // let pk2 = op.pkvObj({}, op.pkvs[7]);
   // console.log("pk2", pk2);
 };
