@@ -1,5 +1,5 @@
 const { objequals } = require('./module/objequals');
-const { schnittstr, reststrs } = require('./module/schnittstr');
+const { schnittstr, reststrs, } = require('./module/schnittstr');
 console.log("--- objclone ---");
 
 let delim = '"]["';
@@ -69,12 +69,13 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
   });
   return attrPath;
 };
-// ToDo: 
-// Test: funktionieren reduzierte pkvs mit den alten Methoden, ObjPath Typen mit/ohne Array?
-// beliebige keys zusammenführen, analog attrPathFlat !!!
+// ToDo !!!: 
+// ObjPath.pkvs umstrukturieren, z.B. Subobjekt nach oben holen und in Excel darstellen
+// beliebige keys zusammenführen, analog attrPathFlat
 // nach Attributarr sortieren
-// Subobjekt nach oben holen und in Excel darstellen
 // gute Funktionen in Module zusammenfassen
+// Testfiles schreiben
+// react Prototyp testen
 // npm Pakete analysieren
 
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
@@ -100,7 +101,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
   };
   constructor3(obj = {}, delimin = '"]["', pathKey = "", objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    // Wie umgehen mit Array-Objekten? !!!!
     if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
     let keys = Object.keys(obj);
     keys.forEach(key => {
@@ -232,8 +232,70 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       "val": el.val
     }));
     return this.pkvs;
-  }
+  };
+  kasFlat(fromTop = true, joinStr = "--") { // flatted die PathKeys des this.kas um 1 Ebene
+    if (!this.kas)  this.kasVonPkvs();
+    if (!fromTop) this.kas = this.kas.map(el => el.reverse());  // !fromTop => beide unteren Ebenen zusammenführen
+    this.kas.forEach(el => {
+      if (el.length > 1) {
+        el.splice(0, 2, fromTop ? el[0] + joinStr + el[1] : el[1] + joinStr + el[0]); // 1. und 2. Ebene zusammenführen
+      }
+      return el;
+    });
+    if (!fromTop) this.kas = this.kas.map(el => el.reverse());
+    return this.kas;
+  };
+  pkvsFlat2(depth = 0, fromTop = false, joinStr = "--", delim = '"]["') {
+    // let pkvsFlat = Array.from(this.pkvs);  // Kopie des übergebenen this.pkvs erzeugen
+    let kasFlat = this.kasFlat(fromTop, joinStr);  // this.kas zunächst 1 Ebene flatten
+    // ggf. weitere Aufrufe von this.kasFlat
+    while (depth == 0 || (depth-- > 1)) { // flat complete
+      kasFlat = this.kasFlat(fromTop, joinStr);
+      let isFlat = kasFlat.findIndex(el => el.length !== 1) === -1;
+      if (isFlat) depth = 1;  // keine weiteren Aufrufe
+    };
+    // geflattetes kas (kasFlat) in pkvsFlat reinjizieren
+    // kasFlat.forEach((el, ix) => pkvsFlat[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den this.pkvs zurückschreiben
+    kasFlat.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den this.pkvs zurückschreiben
+    // this.pkvs = pkvsFlat;
+    return this.pkvs;
+  };
+  pkvsFlat(depth = 0, fromTop = true, joinStr = "--", delim = '"]["') {
+    this.kasFlat(fromTop, joinStr);  // this.kas zunächst 1 Ebene flatten
+    // ggf. weitere Aufrufe von this.kasFlat
+    while (depth == 0 || (depth-- > 1)) { // flat complete
+      this.kasFlat(fromTop, joinStr);
+      let isFlat = this.kas.findIndex(el => el.length !== 1) === -1;
+      if (isFlat) depth = 1;  // keine weiteren Aufrufe
+    };
+    // geflattetes kas in pkvs reinjizieren
+    this.kas.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den this.pkvs zurückschreiben
+    return this.pkvs;
+  };
+
 };
+const check8 = () => {
+  console.log("- check -");
+  const o0 = { "a": 1, "b": 2 };
+  const o1 = { "a": 1, "b": { "e": 5 } };
+  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
+  const o3 = { ...o1, ...o2 };
+
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  console.log("op", op);
+  // let kf = op.kasFlat(1,false);
+  // console.log("kf", kf);
+  // let pkvs = op.pkvsVonKas();
+  // console.log("pkvs", pkvs);
+  let flat = op.kasFlat(true, "--");
+  console.log("fl", flat);
+  let flat2 = op.pkvsFlat(1, true, "--");
+  console.log("fl2", flat2);
+  console.log("op", op);
+
+};
+
 const check5 = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
@@ -458,7 +520,7 @@ const check = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op);
-  let pk2 = op.subPkvs("d", true);
+  let pk2 = op.subObjPath("d", true);
   console.log("pk2", pk2);
   // let o4 = op.obj();
   // console.log("o4",o4);
@@ -527,7 +589,7 @@ const check7 = () => {
   // console.log("pk2", pk2);
 };
 
-check5();
+check8();
 
 module.exports = { 
   objpath, 
