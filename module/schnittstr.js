@@ -164,4 +164,4 @@ const spliceTest = () => {
   let rem = a1.splice(2, 1)
   console.log(a1, ": rem", rem);
 };
-module.exports = { schnittstr, reststrs };
+module.exports = { reststrs, schnittstr, schnitthits };
