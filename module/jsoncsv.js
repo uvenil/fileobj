@@ -27,6 +27,7 @@
   const zuerstZeile = true;
   const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
+// filelist filter
 const filelist = async (ordner = ord1) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
     const fileList = await readDirAsync(ordner);
@@ -89,6 +90,8 @@ const checkfilelistfilter = () => {
   const flf = filelistfilter(fileList, excl, incl, 1, true, false);
   console.log("flf: ", reststrs(flf));
 };
+
+// read json csv save
 const readJsonArr = async (fileArr) => {  // liest JSON-Objekt-Array aus Dateipfad-Array
   let objRead = {};
   try {
@@ -156,6 +159,7 @@ const savecsvjson = async ({ fileNames, jsonArr, csvArr, savePath = resPath }) =
     await fs.writeFile(path.join(savePath, el + '.csv'), csvArr[ix]); // csv-Datei speichern
   });
 };
+
 // arr-csv und obj-csv-inout
 const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclStrings = inclPfadStrings, filterTyp = 0) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   // jsonArr -> csvArr -> fileNames -> save
@@ -199,4 +203,4 @@ const makecsv = (ordner = ord5) => {
   });
 };
 makecsvinout();
-module.exports = { jsonAusOrdner, csvAusJson, savecsvjson, objinout, filelistfilter };
+module.exports = { jsonAusOrdner, csvAusJson, savecsvjson, filelistfilter };
