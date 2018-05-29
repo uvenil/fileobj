@@ -95,14 +95,14 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     const assOp = new ObjPath(assObj);
     return assOp;
   };
-  subObjPath(pathKey, fromStart = null, delim = '"]["') { // Sub-ObjPath von pathKey
+  subObjPath(pathKey, fromStart = null) { // Sub-ObjPath von pathKey
     if (fromStart !== true && fromStart !== false) fromStart = null;
     const subOp = new ObjPath();
     switch (fromStart) {
-      case true: // pathKey am Anfang (benötigt delim)
+      case true: // pathKey am Anfang
         subOp.pkvs = this.pkvs.filter(pkv => pkv.pathKey.startsWith(pathKey));
         break;
-      case false: // pathKey am Ende (benötigt delim)
+      case false: // pathKey am Ende
         subOp.pkvs = this.pkvs.filter(pkv => pkv.pathKey.endsWith(pathKey));
         break;
       default:  // pathKey überhaupt enthalten
@@ -111,7 +111,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return subOp;
   };
   subObj(pathKey, fromStart = null, delim = '"]["') { // Sub-Objekt aus pathKey, subObjekt extrahieren
-    const subOp = this.subObjPath(pathKey, fromStart = null, delim = '"]["');
+    const subOp = this.subObjPath(pathKey, fromStart, delim);
     subOp.pkvNorm(delim);
     return subOp.obj();
   };
@@ -149,15 +149,18 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
-  subFlat(exclArr, inclArr, depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
-    // this.kasVonPkvs();
-    const regExpr = false;
-    const pkArr = this.pkvs.map(pkv => pkv.pathKey);
-    let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);
+  subObjPath2(exclArr, inclArr, regExpr = false) {  // flattet ein Sub-ObjPath im ObjPath
+    const pkArr = this.pkvs.map(pkv => pkv.pathKey);  // Array von PathKeys
+    let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);  // ausgewählte Indices
     let subOp = new ObjPath();
-    subOp.pkvs = this.pkvs.filter((el, ix) => filtIx.indexOf(ix) !== -1);
+    subOp.pkvs = this.pkvs.filter((el, ix) => filtIx.indexOf(ix) !== -1); // nur pkvs der ausgewählten Indices
+    return { subOp, filtIx };
+  };
+  subFlat(exclArr, inclArr, depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
+    const regExpr = false;
+    let { subOp, filtIx } = this.subObjPath2(exclArr, inclArr, regExpr);
     subOp.pkvsFlat(depth, fromTop, joinStr);
-    subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el);
+    subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
     return this.pkvs
   };
 };
@@ -245,13 +248,13 @@ const check5 = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op.pkvs);
-  let sp = op.subObjPath('e');
+  let sp = op.subObjPath('e', true);
   console.log("sp", sp);
   // let pn = sp.pkvNorm();
   // console.log("pn", pn);
   let so = sp.obj();
   console.log("so", so);
-  let so2 = op.subObj('e');
+  let so2 = op.subObj('e', true);
   console.log("so2", so2);
 
   let pk2 = op.pkvObj({}, op.pkvs[2]);
