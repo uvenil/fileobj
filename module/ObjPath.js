@@ -49,7 +49,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
     this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
   };
-  obj(delim = '"]["') { // erstellt zugehöriges Objekt
+  obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
     pKarr = this.pkvs[0].pathKey.split(delim);
@@ -61,8 +61,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     });
     return obj;
   };
-  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {
-    // !!!! be soll nicht getrennnt werden
+  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {  // erstellt pkv-Subobjekt
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
     } else {  // pathKey enthält delim => Rekursion
@@ -113,12 +112,12 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
   subObj(pathKey, fromStart = null, delim = '"]["') { // Sub-Objekt aus pathKey, subObjekt extrahieren
     const subOp = this.subObjPath(pathKey, fromStart = null, delim = '"]["');
-    subOp.pkvNorm();
+    subOp.pkvNorm(delim);
     return subOp.obj();
   };
-  pkvNorm() { // normiert die pkvs pathKeys mit reststrs
+  pkvNorm(delim = '"]["') { // normiert die pkvs pathKeys mit reststrs
     let pathKeys = this.pkvs.map(el => el.pathKey);
-    pathKeys = reststrs(pathKeys);
+    if (schnittstr(pathKeys).str!==delim)  pathKeys = reststrs(pathKeys); // delim alleine nicht rausschneiden
     this.pkvs = this.pkvs.map((el, ix) => ({
       "pathKey": pathKeys[ix],
       "val": el.val
@@ -150,7 +149,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
-  subFlat(exclArr, inclArr, depth = 0, fromTop = true, joinStr = "--") {
+  subFlat(exclArr, inclArr, depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
     // this.kasVonPkvs();
     const regExpr = false;
     const pkArr = this.pkvs.map(pkv => pkv.pathKey);
@@ -246,17 +245,17 @@ const check5 = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op.pkvs);
-  let sp = op.subObjPath('b');
+  let sp = op.subObjPath('e');
   console.log("sp", sp);
-  let pn = sp.pkvNorm();
-  console.log("pn", pn);
+  // let pn = sp.pkvNorm();
+  // console.log("pn", pn);
   let so = sp.obj();
   console.log("so", so);
-  let so2 = op.subObj('b');
+  let so2 = op.subObj('e');
   console.log("so2", so2);
 
-  // let pk2 = op.pkvObj({}, op.pkvs[7]);
-  // console.log("pk2", pk2);
+  let pk2 = op.pkvObj({}, op.pkvs[2]);
+  console.log("pk2", pk2);
 };
 const check6 = () => {
   let strArr = ["bcdefgcd", "decdx", "abcde", "bcdefgcde"];
@@ -321,6 +320,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checka();
+check5();
 
 module.exports = ObjPath;
