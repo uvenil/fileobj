@@ -1,4 +1,5 @@
 const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
+const { filt, filter } = require('./arrayfkt');
 console.log("--- ObjPath ---");
 
 let delim = '"]["';
@@ -149,9 +150,38 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
+  subFlat(exclArr, inclArr, depth = 0, fromTop = true, joinStr = "--") {
+    // this.kasVonPkvs();
+    const regExpr = false;
+    const pkArr = this.pkvs.map(pkv => pkv.pathKey);
+    let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);
+    let subOp = new ObjPath();
+    subOp.pkvs = this.pkvs.filter((el, ix) => filtIx.indexOf(ix) !== -1);
+    subOp.pkvsFlat(depth, fromTop, joinStr);
+    subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el);
+    return this.pkvs
+  };
 };
 
 // Checks
+const checka = () => {
+  console.log("- check -");
+  const o0 = { "a": 1, "b": 2 };
+  const o1 = { "a": 1, "b": { "e": 5 } };
+  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
+  const o3 = { ...o1, ...o2 };
+  const exclArr = ["a"];
+  const inclArr = ["i"];
+  const depth = 1;
+  const fromTop = false;
+
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  console.log("op", op);
+  let sf = op.subFlat(exclArr, inclArr, depth, fromTop);
+  console.log("sf", sf);
+  console.log("op", op);
+};
 const check = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
@@ -291,19 +321,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-const checka = () => {
-  console.log("- check -");
-  const o0 = { "a": 1, "b": 2 };
-  const o1 = { "a": 1, "b": { "e": 5 } };
-  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
-  const o3 = { ...o1, ...o2 };
-
-  console.log("o1", o1);
-  let op = new ObjPath(o1);
-  console.log("op", op);
-  // let pk2 = op.subObjPath("d", true);
-  // console.log("pk2", pk2);
-};
-check9();
+checka();
 
 module.exports = ObjPath;
