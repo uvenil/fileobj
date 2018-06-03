@@ -25,30 +25,30 @@ Object.prototype.isObject = (testObj) => {
 };
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
-  constructor(obj = {}, delimin = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
+  constructor(obj = {}, delim = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
     if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
     let keys = [];
     if (arraySolve && Array.isArray(obj)) keys = [...obj.keys()]
     else keys = Object.keys(obj);
+    let delimin;
     // keys iterieren
     keys.forEach(key => {
-      if (pathKey == "") delim = "";  // 1. Ebene
-      else delim = delimin;
+      if (pathKey == "") delimin = "";  // nur für 1. Ebene
+      else delimin = delim;
       // rekursiv
       if (Object.isObject(obj[key]) || (arraySolve && Array.isArray(obj[key]))) {
-        objPath = new ObjPath(obj[key], delimin, pathKey + delim + key, Array.from(objPath)).pkvs;
+        objPath = new ObjPath(obj[key], delim, pathKey + delimin + key, Array.from(objPath)).pkvs;
       } else {
         objPath.push({
-          pathKey: pathKey + delim + key,
+          pathKey: pathKey + delimin + key,
           val: obj[key]
         });
       }
     });
-    // pkvs ist das ObjPath-konstituierende Attribut
-    // Indices von pkvs und kas korrespondieren
+    // pkvs ist das ObjPath-konstituierende Attribut,  Indices von pkvs und kas korrespondieren
     this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
-    this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
-    this.pkvsFlat = this.pkvswrap(this.kasFlat, delimin); // liefert zur kasfkt zugehörige pkvsfkt
+    this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+    this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
   };
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
