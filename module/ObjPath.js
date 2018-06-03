@@ -86,6 +86,16 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.kas.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
     return this.pkvs;
   };
+  pkvswrap(kasfkt, delim = '"]["', ...args) { // liefert zur kasfkt zugehörige pkvsfkt
+    // ersetzt Meth pkvsFlat durch den Aufruf: op.pkvsFlat = op.pkvswrap(op.kasFlat, delim);
+    let pkvsfkt = (...args) => {
+      this.kas = this.kasVonPkvs(delim);  // zunächst kas aktualisieren und flatten
+      this.kas = kasfkt.apply(this, args);
+      this.pkvs = this.pkvsVonKas(delim);
+      return this.pkvs;
+    };
+    return pkvsfkt;
+  };
   // Kombination und Teilobjekte
   assign(...ObjPathes) {  // liefert einen aus mehreren ObjPathes kombinierten ObjPath über die Fkt. Object.assign()
     // merge auf Objektebene mit Object.assign() möglich
@@ -95,7 +105,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     const assOp = new ObjPath(assObj);
     return assOp;
   };
-  subObjPath2(exclArr, inclArr, regExpr = false) {  // Sub-ObjPath von exclArr und inclArr
+  subObjPathFilter(exclArr, inclArr, regExpr = false) {  // Sub-ObjPath von exclArr und inclArr
     const pkArr = this.pkvs.map(pkv => pkv.pathKey);  // Array von PathKeys
     let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);  // ausgewählte Indices
     let subOp = new ObjPath();
@@ -187,16 +197,48 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonKas(delim);
     return this.pkvs;
   };
+keymove(key = "", steps = 1) {  // unfertig!
+  };
+  // Sub-Manipulation
   subFlat(exclArr, inclArr, key = "", depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
     const regExpr = false;
-    let { subOp, filtIx } = this.subObjPath2(exclArr, inclArr, regExpr);
+    let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
     subOp.pkvsFlat(key, depth, fromTop, joinStr);
     subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
     return this.pkvs;
   };
 };
-
 // Checks
+const checkd = () => {
+  console.log("- check -");
+  const o0 = { "a": 1, "b": 2 };
+  const o1 = { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] };
+  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
+  const o3 = { ...o1, ...o2 };
+  const key = "b";
+  const depth = 1;
+  const fromTop = true;
+  const joinStr = "--";
+
+  console.log("o3", o3);
+  let op1 = new ObjPath(o3);
+  let op2 = new ObjPath(o3);
+  let flat1 = op1.pkvsFlat(key, depth, fromTop, joinStr);
+  console.log("fl1", flat1);
+
+  let delim = '"]["';
+  // op2.pkvsFlat2 = op2.pkvswrap(delim, op2.kasFlat, key, depth, fromTop, joinStr);
+  op2.pkvsFlat2 = op2.pkvswrap(op2.kasFlat, delim);
+  
+  let flat2 = op2.pkvsFlat2(key, depth, fromTop, joinStr);
+  // let flat3 = op2.pkvsFlat2(key, depth, fromTop, joinStr);
+  console.log("fl2", flat2);
+  // console.log("fl3", op2.pkvs);
+
+  // let flat = op.kasFlat("", 1, true, "-");
+  // console.log("fl", flat);
+  // console.log("op", op);
+};
 const checkc = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
@@ -368,9 +410,9 @@ const check8 = () => {
   // console.log("kf", kf);
   // let pkvs = op.pkvsVonKas();
   // console.log("pkvs", pkvs);
-  let flat2 = op.pkvsFlat(1, false, "--");
+  let flat2 = op.pkvsFlat("", 1, false, "--");
   console.log("fl2", flat2);
-  let flat = op.kasFlat(true, "--");
+  let flat = op.kasFlat("", 1, true, "--");
   console.log("fl", flat);
   console.log("op", op);
 };
@@ -395,6 +437,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkc();
+checkd();
 
 module.exports = ObjPath;
