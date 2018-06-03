@@ -48,6 +48,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     // Indices von pkvs und kas korrespondieren
     this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
     this.kas = this.kasVonPkvs(delimin);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+    this.pkvsFlat = this.pkvswrap(this.kasFlat, delimin); // liefert zur kasfkt zugehörige pkvsfkt
   };
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
@@ -172,32 +173,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     });
     return this.kas;
   };
-  kasFlatAlt(depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
-    // ersetzt durch kasFlat mit key = "" (ehemals kasFlatKey)
-    if (!this.kas) this.kasVonPkvs();
-    if (!fromTop) this.kas = this.kas.map(el => el.reverse());  // !fromTop => beide unteren Ebenen zusammenführen
-    this.kas.forEach(el => {
-      if (el.length > 1) {
-        el.splice(0, 2, fromTop ? el[0] + joinStr + el[1] : el[1] + joinStr + el[0]); // 1. und 2. Ebene zusammenführen
-      }
-      return el;
-    });
-    if (!fromTop) this.kas = this.kas.map(el => el.reverse());
-    // ggf. weitere Aufrufe von kasFlat
-    while (depth == 0 || (depth-- > 1)) { // weitere Runden, wenn nicht bereits flat
-      let isFlat = this.kas.findIndex(el => el.length !== 1) === -1;  // komplett flat?
-      if (!isFlat) this.kas = this.kasFlat(depth, fromTop, joinStr);
-      else depth = 1;  // keine weiteren Aufrufe
-    };
-    return this.kas;
-  };
-  pkvsFlat(key = "", depth = 0, fromTop = true, joinStr = "--", delim = '"]["') { // flatted die PathKeysValues (pkvs) und Keyarrays (kas) komplett (depth=0) oder um depth Ebenen
-    this.kas = this.kasVonPkvs(delim);  // zunächst kas aktualisieren und flatten
-    this.kas = this.kasFlat(key, depth, fromTop, joinStr);
-    this.pkvs = this.pkvsVonKas(delim);
-    return this.pkvs;
-  };
-keymove(key = "", steps = 1) {  // unfertig!
+  keymove(key = "", steps = 1) {  // unfertig!
   };
   // Sub-Manipulation
   subFlat(exclArr, inclArr, key = "", depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
@@ -215,10 +191,11 @@ const checkd = () => {
   const o1 = { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
-  const key = "b";
+  const key = "";
   const depth = 1;
-  const fromTop = true;
+  const fromTop = false;
   const joinStr = "--";
+  let delim;
 
   console.log("o3", o3);
   let op1 = new ObjPath(o3);
@@ -226,7 +203,6 @@ const checkd = () => {
   let flat1 = op1.pkvsFlat(key, depth, fromTop, joinStr);
   console.log("fl1", flat1);
 
-  let delim = '"]["';
   // op2.pkvsFlat2 = op2.pkvswrap(delim, op2.kasFlat, key, depth, fromTop, joinStr);
   op2.pkvsFlat2 = op2.pkvswrap(op2.kasFlat, delim);
   
