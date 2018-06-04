@@ -133,6 +133,20 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     subOp.pkvNorm(delim);
     return subOp.obj();
   };
+  subwrap(opfkt, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfkt)
+    const subfkt = (...args) => {  // flattet ein Sub-ObjPath im ObjPath
+      let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
+      console.log("1 subOp.kas", subOp.kas);
+      console.log("2 subOp.pkvs", subOp.pkvs);
+      // !!!! hier: warum nicht subOp als this in opfkt = pkvsFlat?;  warum undefined in kasVonPkvs?
+      opfkt.apply(subOp, args); 
+      console.log("3 subOp.pkvs", subOp.pkvs);
+      
+      subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
+      return this.pkvs;
+    };
+    return subfkt;
+  };
   // Manipulation
   pkvNorm(delim = '"]["') { // normiert die pkvs pathKeys mit reststrs
     let pathKeys = this.pkvs.map(el => el.pathKey);
@@ -167,7 +181,9 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return ka;
   };
   kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
-    if (!this.kas) this.kasVonPkvs();
+    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+console.log(this);
+
     this.kas.forEach(ka => {
       this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka
     });
@@ -185,6 +201,19 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
 };
 // Checks
+const vars = () => ({
+  "o0" : { "a": 1, "b": 2 },
+  "o1" : { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] },
+  "o2" : { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }, // "c": { "f": 5 },
+  // "o3" : { ...vars.o1, ...vars.o2 },
+  "ka" : ['b', '0', '1', 'c', '2'],
+  "exclArr" : ["0"],
+  "inclArr" : ['g'],
+  "regExpr" : false,
+  "key" : "",
+  "depth" : 1,
+  "fromTop" : true,
+});
 const checkd = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
@@ -217,23 +246,22 @@ const checkd = () => {
 };
 const checkc = () => {
   console.log("- check -");
-  const o0 = { "a": 1, "b": 2 };
-  const o1 = { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] };
-  const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
-  const o3 = { ...o1, ...o2 };
-  const ka = ['b', '0', '1', 'c', '2'];
-  const exclArr = ["0"];
-  const inclArr = ['g'];
-  const key = "";
-  const depth = 1;
-  const fromTop = true;
-
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
   console.log("o3", o3);
-  let op = new ObjPath(o3);
-  console.log("op", op.pkvs);
+  // let op = new ObjPath(o3);
+  let op2 = new ObjPath(o3);
+  console.log("tesg");
 
-  let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
-  console.log("sf", sf);
+  // console.log("op", op.pkvs);
+
+  // let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
+  // console.log("sf", sf);
+  op2.subFlat2 = op2.subwrap(op2.pkvsFlat, v.exclArr, v.inclArr, v.regExpr);
+  console.log("+++",op2.subFlat2);
+
+  const sf2 = op2.subFlat2(v.key, v.depth, v.fromTop);
+  console.log("sf2", sf2);
   // console.log("op", op);
 };
 const checkb = () => {
@@ -413,6 +441,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkd();
+checkc();
 
 module.exports = ObjPath;
