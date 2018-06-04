@@ -26,16 +26,28 @@ Object.prototype.isObject = (testObj) => {
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
   constructor(obj = {}, delim = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Objektebene bei Rekursion
+    console.log("------ constructor ------");
+    console.log("pathKey", pathKey);
+    
+    if (pathKey == "") console.log("+ constructor Start +");
+    
+    if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Constructor-Aufruf
     let keys = [];
     if (arraySolve && Array.isArray(obj)) keys = [...obj.keys()]
     else keys = Object.keys(obj);
     let delimin;
     // keys iterieren
-    keys.forEach(key => {
+    keys.forEach((key, ix) => {
+      console.log("ix", ix);
+      console.log("key",key);
+      console.log("pathKey", pathKey);
       if (pathKey == "") delimin = "";  // nur für 1. Ebene
       else delimin = delim;
-      // rekursiv
+      if (pathKey == "" && ix === keys.length-1) console.log("   - constructor Ende -");
+      
+      console.log("delimin", delimin);
+      console.log("objPath", objPath);
+  // rekursiv
       if (Object.isObject(obj[key]) || (arraySolve && Array.isArray(obj[key]))) {
         objPath = new ObjPath(obj[key], delim, pathKey + delimin + key, Array.from(objPath)).pkvs;
       } else {
@@ -81,7 +93,10 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return obj;
   };
   kasVonPkvs(delim = '"]["') {
-    return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
+    let kas =  this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
+    console.log("- kasVonPkvs -  ");
+    return kas;
+    // return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
   };
   pkvsVonKas(delim = '"]["') {  // nur bei kas.length = pkvs.length
     this.kas.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
@@ -182,8 +197,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
   kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
-console.log(this);
-
     this.kas.forEach(ka => {
       this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka
     });
@@ -251,15 +264,13 @@ const checkc = () => {
   console.log("o3", o3);
   // let op = new ObjPath(o3);
   let op2 = new ObjPath(o3);
-  console.log("tesg");
+  console.log("ObjPath Ende");
 
   // console.log("op", op.pkvs);
 
   // let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
   // console.log("sf", sf);
   op2.subFlat2 = op2.subwrap(op2.pkvsFlat, v.exclArr, v.inclArr, v.regExpr);
-  console.log("+++",op2.subFlat2);
-
   const sf2 = op2.subFlat2(v.key, v.depth, v.fromTop);
   console.log("sf2", sf2);
   // console.log("op", op);
