@@ -82,38 +82,34 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     else keys = Object.keys(obj);
     let delimin;
     let ende = false
-    let res = [];
     // keys iterieren
-    keys.forEach((key, ix) => {
-      if (pathKey == "") delimin = "";  // nur für 1. Ebene
-      else delimin = delim;
-      if (pathKey == "" && ix === keys.length - 1) ende = true; // letzter Index in der 1. Ebene -> Ende
-      // rekursiv
-      console.log("c2 objPath", objPath);
-      console.log("--- pkvgen Aufruf ---");
-      
-      res = res.concat(this.pkvgen(obj, key, delim, pathKey, [], arraySolve));
-      console.log("c res", res);
-    });
-    if (ende) console.log("   - constructor Ende2 -");
+    // keys.forEach((key, ix) => {
+    //   if (pathKey == "") delimin = "";  // nur für 1. Ebene
+    //   else delimin = delim;
+    //   if (pathKey == "" && ix === keys.length - 1) ende = true; // letzter Index in der 1. Ebene -> Ende
+    //   // rekursiv
+    //   console.log("--- pkvgen Aufruf ---");
+    //   objPath = objPath.concat(this.pkvgen(obj, key, delim, pathKey, [], arraySolve));
+    // });
+    objPath = this.pkvgen(obj, "", delim, pathKey, [], arraySolve);
+    console.log("objPath", objPath);
+
+    // if (ende) console.log("   - constructor Ende2 -");
     // pkvs ist das ObjPath-konstituierende Attribut,  Indices von pkvs und kas korrespondieren
-    if (ende) {
+    // if (ende) {
       this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
       this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
       this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
-    };
+    // };
   };  // !!! hier: pkvgen richtig machen
   pkvgen(obj = {}, key, delim = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    let delimin = delim
-    if (pathKey === "") delimin = "";
-    console.log("- pkvgen", { key, delim, pathKey, objPath, arraySolve });
-    console.log("obj[key]",obj[key]);
-    let val = obj[key];
+    let delimin = delim;
+    if (pathKey === "") delimin = ""; 
+    let val = (key !== "") ? obj[key] : obj;
     let keys = [];
     if (Object.isObject(val) || (arraySolve && Array.isArray(val))) {
       if (arraySolve && Array.isArray(val)) keys = [...val.keys()]
       else keys = Object.keys(val);
-      console.log("keys",keys);
       keys.forEach((k) => {
         objPath = this.pkvgen(val, k, delim, pathKey + delimin + key, Array.from(objPath));
       });
@@ -123,8 +119,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
         val: obj[key]
       });
     }
-    console.log("objPath", objPath);
-    
     return objPath;
   };
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
