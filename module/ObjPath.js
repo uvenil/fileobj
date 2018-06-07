@@ -92,6 +92,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     //   objPath = objPath.concat(this.pkvgen(obj, key, delim, pathKey, [], arraySolve));
     // });
     objPath = this.pkvgen(obj, pathKey, delim, arraySolve);
+    // console.log("objPath", JSON.stringify(objPath));
     console.log("objPath", objPath);
 
     // if (ende) console.log("   - constructor Ende2 -");
@@ -102,28 +103,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
     // };
   };  // !!! hier: pkvgen richtig machen
-  pkvgenAlt(obj = {}, key, pathKey = "", delim = '"]["', arraySolve = true, objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    let delimin = delim;
-    if (pathKey === "") delimin = ""; 
-    let val = (key !== "") ? obj[key] : obj;
-    let keys = [];
-    if (Object.isObject(val) || (arraySolve && Array.isArray(val))) { // val = Objekt oder Array: Keys ermitteln und durchlaufen
-      if (arraySolve && Array.isArray(val)) keys = [...val.keys()]  // Array
-      else keys = Object.keys(val); // Objekt
-      keys.forEach((k) => { // alle keys durchlaufen
-        let pK = pathKey + delimin + key; // key wird zum pathKey hinzugefügt
-        objPath = this.pkvgen(val, k, pK, delim, arraySolve, objPath);
-      });
-    } else {  // primitiver Wert: pathKey und Wert zuweisen
-      let pkv = {
-        pathKey: pathKey + delimin + key,
-        val: val
-      }
-      objPath.push(pkv);
-    }
-    return objPath;
-  };
-  pkvgen(obj = {}, pathKey = "", delim = '"]["', arraySolve = true, objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
+  pkvgen2(obj = {}, pathKey = "", delim = '"]["', arraySolve = true, objPath = []) { //  erstellt Array mit pathKeys, val (objPath) von obj
     let val, key, delimin;
     if (pathKey === "") { // Gesamt-Objekt
       delimin = "";
@@ -145,6 +125,32 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     } else {  // primitiver Wert: pathKey und Wert zuweisen
       let pkv = { pathKey, val };
       objPath.push(pkv);
+    }
+    return objPath;
+  };
+  pkvgen(obj = {}, pathKey = "", delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
+    let val, key, delimin;
+    if (pathKey === "") { // Gesamt-Objekt
+      delimin = "";
+      key = "";
+      val = obj;
+    } else {  // Attribut mit pathKey
+      delimin = delim;
+      key = pathKey.split(delim).reverse()[0];
+      val = obj[key];
+    }
+    let keys = [];
+    let objPath = [];
+    if (Object.isObject(val) || (arraySolve && Array.isArray(val))) { // val = Objekt oder Array: Keys ermitteln und durchlaufen
+      if (arraySolve && Array.isArray(val)) keys = [...val.keys()]  // Array
+      else keys = Object.keys(val); // Objekt
+      keys.forEach((k) => { // alle keys durchlaufen
+        let pK = pathKey + delimin + k; // key wird zum pathKey hinzugefügt
+        objPath = objPath.concat(this.pkvgen(val, pK, delim, arraySolve));
+      });
+    } else {  // primitiver Wert: pathKey und Wert zuweisen
+      let pkv = { pathKey, val };
+      return [pkv];
     }
     return objPath;
   };
@@ -181,7 +187,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
   kasVonPkvs(delim = '"]["') {
     let kas =  this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
-    console.log("- kasVonPkvs -  ");
     return kas;
     // return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
   };
@@ -351,8 +356,6 @@ const checkc = () => {
   console.log("o3", o3);
   // let op = new ObjPath(o3);
   let op2 = new ObjPath(o3);
-  console.log("ObjPath Ende");
-
   // console.log("op", op.pkvs);
 
   // let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
