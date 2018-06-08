@@ -26,9 +26,9 @@ Object.prototype.isObject = (testObj) => {
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
   constructor(obj = {}, delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
-      this.pkvs = this.pkvsVonObj(obj, delim, arraySolve, ""); // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
-      this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
-      this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
+    this.pkvs = this.pkvsVonObj(obj, delim, arraySolve, ""); // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
+    this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
+    this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
   };
   pkvsVonObj(obj = {}, delim = '"]["', arraySolve = true, pathKey = "") { //  erstellt objPath = Array mit pathKeys, val (objPath) von obj
     let val, key, delimin;
@@ -56,7 +56,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     }
     return objPath;
   };
-
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
@@ -121,7 +120,10 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     const pkArr = this.pkvs.map(pkv => pkv.pathKey);  // Array von PathKeys
     let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);  // ausgewählte Indices
     let subOp = new ObjPath();
+    console.log("1 subOp", subOp);
+    
     subOp.pkvs = this.pkvs.filter((el, ix) => filtIx.indexOf(ix) !== -1); // nur pkvs der ausgewählten Indices
+    // subOp.kas = subOp.kasVonPkvs();
     return { subOp, filtIx }; // neben Subo-ObjPath die verwendeten Indices
   };
   subObjPath(pathKey, fromStart = null) { // Sub-ObjPath von pathKey-String
@@ -144,13 +146,13 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     subOp.pkvNorm(delim);
     return subOp.obj();
   };
-  subwrap(opfkt, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfkt)
+  subwrap(opfktname, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfktname)
     const subfkt = (...args) => {  // flattet ein Sub-ObjPath im ObjPath
       let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
-      console.log("1 subOp.kas", subOp.kas);
-      console.log("2 subOp.pkvs", subOp.pkvs);
+      console.log("2 subOp", subOp);
       // !!!! hier: warum nicht subOp als this in opfkt = pkvsFlat?;  warum undefined in kasVonPkvs?
-      opfkt.apply(subOp, args); 
+      subOp[opfktname].apply(subOp, args); 
+      // opfkt.apply(subOp, args); 
       console.log("3 subOp.pkvs", subOp.pkvs);
       
       subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
@@ -260,12 +262,13 @@ const checkc = () => {
   console.log("o3", o3);
   // let op = new ObjPath(o3);
   let op2 = new ObjPath(o3);
-  // console.log("op", op.pkvs);
+  console.log("op", op2.pkvs);
 
   // let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
   // console.log("sf", sf);
-  op2.subFlat2 = op2.subwrap(op2.pkvsFlat, v.exclArr, v.inclArr, v.regExpr);
+  op2.subFlat2 = op2.subwrap("pkvsFlat", v.exclArr, v.inclArr, v.regExpr);
   const sf2 = op2.subFlat2(v.key, v.depth, v.fromTop);
+  // const sf2 = op2.subFlat(v.exclArr, v.inclArr, v.key, v.depth, v.fromTop);
   console.log("sf2", sf2);
   // console.log("op", op);
 };
