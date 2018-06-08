@@ -25,83 +25,10 @@ Object.prototype.isObject = (testObj) => {
 };
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
-  constructorOrg(obj = {}, delim = '"]["', pathKey = "", objPath = [], arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
-    if (pathKey == "") console.log("+ constructor Start +");
-    console.log("------ constructor ------");
-    
-    console.log("pathKey", pathKey);
-    
-    if (pathKey == "") objPath = []; // Ergebnis-Array wird zu pkvs,  leerer pathKey ist das Zeichen für 1. Constructor-Aufruf
-    let keys = [];
-    if (arraySolve && Array.isArray(obj)) keys = [...obj.keys()]
-    else keys = Object.keys(obj);
-    let delimin;
-    let ende = false
-    // keys iterieren
-    keys.forEach((key, ix) => {
-      console.log("- ix", ix);
-      console.log("key",key);
-      console.log("objPath", objPath);  // !!! hier: warum bei ix = 1 undefined?
-
-      if (pathKey == "") delimin = "";  // nur für 1. Ebene
-      else delimin = delim;
-      if (pathKey == "" && ix === keys.length-1) ende = true;
-      
-      console.log("delimin", delimin);
-      let objPath2 = [...objPath];
-      // rekursiv
-      if (Object.isObject(obj[key]) || (arraySolve && Array.isArray(obj[key]))) {
-        console.log("new");
-        
-        // objPath2 = new ObjPath(obj[key], delim, pathKey + delimin + key, Array.from(objPath)).pkvs;
-      } else {
-        objPath2.push({
-          pathKey: pathKey + delimin + key,
-          val: obj[key]
-        });
-        console.log("pushed objPath", objPath);
-      }
-      console.log("out1 objPath", objPath);
-      objPath = objPath || objPath2;
-      console.log("out2 objPath", objPath);
-    });
-    if (ende) console.log("   - constructor Ende2 -");
-    // pkvs ist das ObjPath-konstituierende Attribut,  Indices von pkvs und kas korrespondieren
-    if (ende) {
-      this.pkvs = objPath; // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
-      this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
-      this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
-    };
-  };
   constructor(obj = {}, delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
       this.pkvs = this.pkvsVonObj(obj, delim, arraySolve, ""); // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
       this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
       this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
-  };
-  pkvgen2(obj = {}, pathKey = "", delim = '"]["', arraySolve = true, objPath = []) { //  erstellt objPath = Array mit pathKeys, val (objPath) von obj
-    let val, key, delimin;
-    if (pathKey === "") { // Gesamt-Objekt
-      delimin = "";
-      key = "";
-      val = obj;
-    } else {  // Attribut mit pathKey
-      delimin = delim;
-      key = pathKey.split(delim).reverse()[0];
-      val = obj[key];
-    }
-    let keys = [];
-    if (Object.isObject(val) || (arraySolve && Array.isArray(val))) { // val = Objekt oder Array: Keys ermitteln und durchlaufen
-      if (arraySolve && Array.isArray(val)) keys = [...val.keys()]  // Array
-      else keys = Object.keys(val); // Objekt
-      keys.forEach((k) => { // alle keys durchlaufen
-        let pK = pathKey + delimin + k; // key wird zum pathKey hinzugefügt
-        objPath = this.pkvgen(val, pK, delim, arraySolve, objPath);
-      });
-    } else {  // primitiver Wert: pathKey und Wert zuweisen
-      let pkv = { pathKey, val };
-      objPath.push(pkv);
-    }
-    return objPath;
   };
   pkvsVonObj(obj = {}, delim = '"]["', arraySolve = true, pathKey = "") { //  erstellt objPath = Array mit pathKeys, val (objPath) von obj
     let val, key, delimin;
