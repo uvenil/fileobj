@@ -192,6 +192,18 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.kas;
   };
   keymove(key = "", steps = 1) {  // unfertig!
+    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+    this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
+      let ixKey = ka.indexOf(key);
+      let ixChange = ixKey + steps;
+      ixChange = Math.max(0, ixChange);
+      ixChange = Math.min(ka.length-1, ixChange);
+      const temp = ka[ixKey];
+      ka[ixKey] = ka[ixChange];
+      ka[ixChange] = temp;
+      return ka;
+    });
+    return this.kas;
   };
   // Sub-Manipulation
   subFlat(exclArr, inclArr, key = "", depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
@@ -217,6 +229,17 @@ const vars = () => ({
   "depth" : 1,
   "fromTop" : true,
 });
+const checke = () => {
+  console.log("- check -");
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
+  console.log("o3", o3);
+  let op = new ObjPath(o3);
+  // console.log("op.p", op.pkvs);
+  console.log("op.kas", op.kas);
+  op.keymove("0", -6);
+  console.log("op.kas", op.kas);
+};
 const checkd = () => {
   console.log("- check -");
   const o0 = { "a": 1, "b": 2 };
@@ -441,6 +464,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkc();
+checke();
 
 module.exports = ObjPath;
