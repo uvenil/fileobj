@@ -142,10 +142,10 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     subOp.pkvNorm(delim);
     return subOp.obj();
   };
-  subwrap(opfktname, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfktname)
+  subwrap(opfktName, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfktName)
     const subfkt = (...args) => {  // flattet ein Sub-ObjPath im ObjPath
       let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
-      subOp[opfktname].apply(subOp, args); 
+      subOp[opfktName].apply(subOp, args); 
       subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
       return this.pkvs;
     };
@@ -195,6 +195,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
   // Sub-Manipulation
   subFlat(exclArr, inclArr, key = "", depth = 0, fromTop = true, joinStr = "--") {  // flattet ein Sub-ObjPath im ObjPath
+    // ersetzt durch: Def.: op.subFlat = op.subwrap("pkvsFlat", exclArr, inclArr, regExpr);   Aufruf: const sf = op2.subFlat(key, depth, fromTop);
     const regExpr = false;
     let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
     subOp.pkvsFlat(key, depth, fromTop, joinStr);
@@ -210,9 +211,9 @@ const vars = () => ({
   // "o3" : { ...vars.o1, ...vars.o2 },
   "ka" : ['b', '0', '1', 'c', '2'],
   "exclArr" : ["0"],
-  "inclArr" : ['g'],
+  "inclArr" : ['b'],
   "regExpr" : false,
-  "key" : "",
+  "key" : "2",
   "depth" : 1,
   "fromTop" : true,
 });
@@ -251,12 +252,12 @@ const checkc = () => {
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
   console.log("o3", o3);
-  // let op = new ObjPath(o3);
+  let op = new ObjPath(o3);
   let op2 = new ObjPath(o3);
   console.log("op", op2.pkvs);
 
-  // let sf = op.subFlat(exclArr, inclArr, key, depth, fromTop);
-  // console.log("sf", sf);
+  let sf = op.subFlat(v.exclArr, v.inclArr, v.key, v.depth, v.fromTop);
+  console.log("sf", sf);
   op2.subFlat2 = op2.subwrap("pkvsFlat", v.exclArr, v.inclArr, v.regExpr);
   const sf2 = op2.subFlat2(v.key, v.depth, v.fromTop);
   // const sf2 = op2.subFlat(v.exclArr, v.inclArr, v.key, v.depth, v.fromTop);
