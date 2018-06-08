@@ -87,11 +87,9 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return obj;
   };
   kasVonPkvs(delim = '"]["') {
-    
-    let kas =  this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
-    console.log("kasVonPkvs", kas);
-    return kas;
-    // return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
+    // let kas =  this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
+    // return kas;
+    return this.pkvs.map(el => el.pathKey.split(delim)); // Array mit den pathKey-Arrays aus dem objPath extrahieren
   };
   pkvsVonKas(delim = '"]["') {  // nur bei kas.length = pkvs.length
     this.kas.forEach((el, ix) => this.pkvs[ix].pathKey = el.join(delim));  // geänderte pathKeys zurückwandeln in Strings und in den AttrPath zurückschreiben
@@ -120,10 +118,8 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     const pkArr = this.pkvs.map(pkv => pkv.pathKey);  // Array von PathKeys
     let filtIx = filt(pkArr, exclArr, inclArr, regExpr, true);  // ausgewählte Indices
     let subOp = new ObjPath();
-    console.log("1 subOp", subOp);
-    
     subOp.pkvs = this.pkvs.filter((el, ix) => filtIx.indexOf(ix) !== -1); // nur pkvs der ausgewählten Indices
-    // subOp.kas = subOp.kasVonPkvs();
+    // subOp.kas = subOp.kasVonPkvs();  // kas werden erst bei Bedarf ermittelt
     return { subOp, filtIx }; // neben Subo-ObjPath die verwendeten Indices
   };
   subObjPath(pathKey, fromStart = null) { // Sub-ObjPath von pathKey-String
@@ -149,12 +145,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   subwrap(opfktname, exclArr = [], inclArr = [], regExpr = false, ...args) { // erstellt Funktion zur Modifikation eines Sub-ObjPath aus ObjPath-Funktion (opfktname)
     const subfkt = (...args) => {  // flattet ein Sub-ObjPath im ObjPath
       let { subOp, filtIx } = this.subObjPathFilter(exclArr, inclArr, regExpr);
-      console.log("2 subOp", subOp);
-      // !!!! hier: warum nicht subOp als this in opfkt = pkvsFlat?;  warum undefined in kasVonPkvs?
       subOp[opfktname].apply(subOp, args); 
-      // opfkt.apply(subOp, args); 
-      console.log("3 subOp.pkvs", subOp.pkvs);
-      
       subOp.pkvs.forEach((el, ix) => this.pkvs[filtIx[ix]] = el); // geflattete Sub-pkvs in pkvs einfügen
       return this.pkvs;
     };
