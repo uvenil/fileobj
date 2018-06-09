@@ -256,7 +256,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       ka[ixChange] = temp;
       return ka;
     });
-    // !!! hier: warum b - e?
     return this.kas;
   };
   // Sub-Manipulation
@@ -269,6 +268,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
+module.exports = { ObjPath, objwrap };
 // Checks
 const vars = () => ({
   "o0" : { "a": 1, "b": 2 },
@@ -541,6 +541,7 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkg();
+// checkg();
 
-module.exports = ObjPath;
+module.exports = { ObjPath, objwrap };
+// export { ObjPath, objwrap };
