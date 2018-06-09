@@ -23,6 +23,16 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
+const objwrap = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
+  let objfkt = (...args) => {
+    let op = new ObjPath(obj, delim, arraySolve);
+    op[pkvsfktname].apply(op.pkvs, args);
+    let retObj = op.obj();
+    return retObj;
+  };
+  return objfkt;
+};
+
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
   constructor(obj = {}, delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
@@ -249,6 +259,15 @@ const vars = () => ({
   "depth" : 1,
   "fromTop" : true,
 });
+const checkf = () => {
+  console.log("- check -");
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
+  const okeymove = objwrap("pkeymove", o3);
+  let o4 = okeymove("d", 1);
+  console.log("o3",o3);
+  console.log("o4",o4);
+}; 
 const checke = () => {
   console.log("- check -");
   const v = vars();
@@ -261,9 +280,7 @@ const checke = () => {
   op.subpkeymove = op.subwrap("pkeymove", v.exclArr, v.inclArr, v.regExpr);
   op.subpkeymove("d", 2);
   console.log("op.pkvs", op.pkvs);
-  
   console.log("op.kas", op.kas);
-
 };
 const checkd = () => {
   console.log("- check -");
@@ -489,6 +506,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checke();
+checkf();
 
 module.exports = ObjPath;
