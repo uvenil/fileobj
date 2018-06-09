@@ -45,11 +45,10 @@ const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // lief
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
-    console.log("op.pkvs", op.pkvs);
-    
     op[pkvsfktname].apply(op.pkvs, args);
     console.log("op.pkvs", op.pkvs);
     let retObj = op.obj(delim);
+    console.log("op.pkvs", op.pkvs);
     return retObj;
   };
   return objfkt;
@@ -92,25 +91,22 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
+    this.pkvsSort();  // Zahlen-keys nach hinten (hoher Index), damit ggf. ein Objekt statt ein Array entsteht
     pKarr = this.pkvs[0].pathKey.split(delim);
     if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
     else obj = {};  // erster  Key = String => Objekt
     // für jedes pkv das Objekt mit einem Unterobjekt ergänzen
     this.pkvs.forEach(pkv => {
-      console.log("+++++ pkv", pkv, "+++++");
-      
       obj = this.pkvObj(obj, pkv, delim);
-      // console.log("obj", obj);
       return obj;
     });
     return obj;
   };
   pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {  // erstellt pkv-Subobjekt
-    console.log("--- obj", obj);
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
     } else {  // pathKey enthält delim => Rekursion
-      // Parameter pkv
+      // Parameter subPkv
       const subPkv = JSON.parse(JSON.stringify(pkv));  // da dies nachfolgend verändert wird, während pkv unverändert bleiben soll
       const keys = subPkv.pathKey.split(delim);  // Array der keys
       subPkv.pathKey = keys.slice(1).join(delim); // erster key abgespalten zur neuen Objektbezeihnung keys[0]
@@ -126,11 +122,8 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       } else {  // nächster Key = String => Objekt
         subObj = {}; // ggf. leeres Objekt erzeugen
       }
-      // Rekursion
-      obj[key] = this.pkvObj(subObj, subPkv, delim);
+      obj[key] = this.pkvObj(subObj, subPkv, delim);  // Rekursion
     };
-    console.log("xxx obj", obj);
-    
     return obj;
   };
   kasVonPkvs(delim = '"]["') {
@@ -207,6 +200,27 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       "val": el.val
     }));
     return this.pkvs;
+  };
+  kasSort() { // sortiert die kas, so dass Zahlen-keys hinten sind
+    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+    this.kas.sort((a, b) => this.kaSort(a, b));
+    return this.kas;
+  };
+  pkvsSort() { // sortiert die kas, so dass Zahlen-keys hinten sind
+    this.pkvs.sort((a, b) => this.kaSort(a.pathKey, b.pathKey));
+    return this.pkvs;
+  };
+
+  kaSort(ka1, ka2) {
+    // console.log("ka1", ka1, "ka2", ka2);
+    if (ka1[0] === ka2[0]) {  // 1. key gleich
+      if (ka1.length === 1) return -1 // keine weitere keys im 1. keyarray
+      else if (ka2.length === 1) return 1  // keine weitere keys im 2. keyarray
+      return this.kaSort(ka1.slice(1), ka2.slice(1));  // Rekursion
+    } else {
+      if (ka1[0] >= 0 && !(ka2[0] >= 0)) return 1 // vertauschen, da 1. key nur im 1. keyarray ist Zahl
+      return -1;  // nicht vertauschen
+    }
   };
   kaFlat(ka = [], key = "", depth = 0, fromTop = true, joinStr = "--") {  // flattet ka ab key
     // ! modifiziert ka direkt
@@ -285,7 +299,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
 // Checks
 const vars = () => ({
   "o0" : { "a": 1, "b": 2 },
-  "o1" : { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] },
+  "o1": { "a": 1, "b": [6, { "e": 5 }, [1, 2]] },
   "o2" : { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }, // "c": { "f": 5 },
   // "o3" : { ...vars.o1, ...vars.o2 },
   "ka" : ['b', '0', '1', 'c', '2'],
@@ -296,6 +310,16 @@ const vars = () => ({
   "depth" : 1,
   "fromTop" : true,
 });
+const checkg = () => {
+  console.log("- check -");
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
+  const okeymove = objwrap("pkeymove");
+
+  let o4 = okeymove(o3, true, "e", -1);
+  console.log("o3", o3);
+  console.log("o4", o4);
+}; 
 const checkf = () => {
   console.log("- check -");
   const v = vars();
@@ -544,6 +568,6 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkf();
+checkg();
 
 module.exports = ObjPath;
