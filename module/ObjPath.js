@@ -29,6 +29,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonObj(obj, delim, arraySolve, ""); // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
     this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
     this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
+    this.pkeymove = this.pkvswrap(this.keymove);
   };
   pkvsVonObj(obj = {}, delim = '"]["', arraySolve = true, pathKey = "") { //  erstellt objPath = Array mit pathKeys, val (objPath) von obj
     let val, key, delimin;
@@ -191,15 +192,34 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     });
     return this.kas;
   };
+  keyexchange(key = "", steps = 1) {  // tauscht einen key mit dem key aus der steps weiter liegt
+    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+    this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
+      let ixKey = ka.indexOf(key);
+      let ixChange = ixKey + steps;
+      ixChange = Math.max(0, ixChange);
+      ixChange = Math.min(ka.length - 1, ixChange);
+      const temp = ka[ixKey];
+      ka[ixKey] = ka[ixChange];
+      ka[ixChange] = temp;
+      return ka;
+    });
+    return this.kas;
+  };
   keymove(key = "", steps = 1) {  // unfertig!
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
     this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
       let ixKey = ka.indexOf(key);
       let ixChange = ixKey + steps;
       ixChange = Math.max(0, ixChange);
-      ixChange = Math.min(ka.length-1, ixChange);
+      ixChange = Math.min(ka.length - 1, ixChange);
       const temp = ka[ixKey];
-      ka[ixKey] = ka[ixChange];
+      let i = ixKey;
+      const step = steps / Math.abs(steps); // +1 oder -1
+      while (i !== ixChange && (i+step) >=0 && (i+step) < ka.length) {
+        ka[i] = ka[i + step];
+        i += step;
+      }
       ka[ixChange] = temp;
       return ka;
     });
@@ -222,10 +242,10 @@ const vars = () => ({
   "o2" : { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }, // "c": { "f": 5 },
   // "o3" : { ...vars.o1, ...vars.o2 },
   "ka" : ['b', '0', '1', 'c', '2'],
-  "exclArr" : ["0"],
-  "inclArr" : ['b'],
+  "exclArr" : ['g'],
+  "inclArr" : [''],
   "regExpr" : false,
-  "key" : "2",
+  "key" : "b",
   "depth" : 1,
   "fromTop" : true,
 });
@@ -235,10 +255,15 @@ const checke = () => {
   o3 = { ...v.o1, ...v.o2 };
   console.log("o3", o3);
   let op = new ObjPath(o3);
-  // console.log("op.p", op.pkvs);
   console.log("op.kas", op.kas);
-  op.keymove("0", -6);
+  // op.pkeymove = op.pkvswrap(op.keymove);
+  console.log("op.pkvs", op.pkvs);
+  op.subpkeymove = op.subwrap("pkeymove", v.exclArr, v.inclArr, v.regExpr);
+  op.subpkeymove("d", 2);
+  console.log("op.pkvs", op.pkvs);
+  
   console.log("op.kas", op.kas);
+
 };
 const checkd = () => {
   console.log("- check -");
