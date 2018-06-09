@@ -23,11 +23,30 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
-const objwrap = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
+const objwrapAlt = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
   let objfkt = (...args) => {
     let op = new ObjPath(obj, delim, arraySolve);
     op[pkvsfktname].apply(op.pkvs, args);
     let retObj = op.obj();
+    return retObj;
+  };
+  return objfkt;
+};
+const objwrap2 = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
+  let objfkt = (obj, delim, arraySolve, ...args) => {
+    let op = new ObjPath(obj, delim, arraySolve);
+    op[pkvsfktname].apply(op.pkvs, args);
+    let retObj = op.obj(delim);
+    return retObj;
+  };
+  return objfkt;
+};
+const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
+  let objfkt = (obj, arraySolve, ...args) => {
+    let delim = '"]["';
+    let op = new ObjPath(obj, delim, arraySolve);
+    op[pkvsfktname].apply(op.pkvs, args);
+    let retObj = op.obj(delim);
     return retObj;
   };
   return objfkt;
@@ -39,7 +58,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     this.pkvs = this.pkvsVonObj(obj, delim, arraySolve, ""); // pkvs = pathKeyValues (früher: attrPath) = [ {pathKey:, val:}, {pathKey:, val:}, ...];  pathKey = pathKeyStr
     this.kas = this.kasVonPkvs(delim);  // kas = keyArrays (früher: pathArr) = [[pathKeyArr1], [pathKeyArr2], ...]
     this.pkvsFlat = this.pkvswrap(this.kasFlat, delim); // liefert zur kasfkt zugehörige pkvsfkt
-    this.pkeymove = this.pkvswrap(this.keymove);
+    this.pkeymove = this.pkvswrap(this.keymove, delim);
   };
   pkvsVonObj(obj = {}, delim = '"]["', arraySolve = true, pathKey = "") { //  erstellt objPath = Array mit pathKeys, val (objPath) von obj
     let val, key, delimin;
@@ -70,12 +89,13 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
+    
     pKarr = this.pkvs[0].pathKey.split(delim);
     if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
     else obj = {};  // erster  Key = String => Objekt
     // für jedes pkv das Objekt mit einem Unterobjekt ergänzen
     this.pkvs.forEach(pkv => {
-      obj = this.pkvObj(obj, pkv);
+      obj = this.pkvObj(obj, pkv, delim);
     });
     return obj;
   };
@@ -89,10 +109,10 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       // Rekursion
       if (pKarr[1] >= 0) {  // nächster Key = Zahl => Array
         obj[pKarr[0]] = obj[pKarr[0]] || []; // ggf. leeres Objekt erzeugen
-        obj[pKarr[0]] = this.pkvObj(Array.from(obj[pKarr[0]]), pkvCopy);
+        obj[pKarr[0]] = this.pkvObj(Array.from(obj[pKarr[0]]), pkvCopy, delim);
       } else {  // nächster Key = String => Objekt
         obj[pKarr[0]] = obj[pKarr[0]] || {}; // ggf. leeres Objekt erzeugen
-        obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkvCopy);
+        obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkvCopy, delim);
       }
     };
     return obj;
@@ -216,8 +236,9 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     });
     return this.kas;
   };
-  keymove(key = "", steps = 1) {  // unfertig!
+  keymove(key = "", steps = 1) {  // verschiebt key um steps in kas
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+    console.log(this.kas);
     this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
       let ixKey = ka.indexOf(key);
       let ixChange = ixKey + steps;
@@ -233,6 +254,8 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       ka[ixChange] = temp;
       return ka;
     });
+    console.log(this.kas);
+    // !!! hier: warum b - e?
     return this.kas;
   };
   // Sub-Manipulation
@@ -263,8 +286,9 @@ const checkf = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const okeymove = objwrap("pkeymove", o3);
-  let o4 = okeymove("d", 1);
+  const okeymove = objwrap("pkeymove");
+
+  let o4 = okeymove(o3, true, "e", -1);
   console.log("o3",o3);
   console.log("o4",o4);
 }; 
