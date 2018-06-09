@@ -23,37 +23,16 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
-const objwrapAlt = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
-  let objfkt = (...args) => {
-    let op = new ObjPath(obj, delim, arraySolve);
-    op[pkvsfktname].apply(op.pkvs, args);
-    let retObj = op.obj();
-    return retObj;
-  };
-  return objfkt;
-};
-const objwrap2 = (pkvsfktname, obj = {}, delim = '"]["', arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
-  let objfkt = (obj, delim, arraySolve, ...args) => {
-    let op = new ObjPath(obj, delim, arraySolve);
-    op[pkvsfktname].apply(op.pkvs, args);
-    let retObj = op.obj(delim);
-    return retObj;
-  };
-  return objfkt;
-};
 const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
     op[pkvsfktname].apply(op.pkvs, args);
-    console.log("op.pkvs", op.pkvs);
     let retObj = op.obj(delim);
-    console.log("op.pkvs", op.pkvs);
     return retObj;
   };
   return objfkt;
 };
-
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
   constructor(obj = {}, delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
@@ -91,7 +70,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
-    this.pkvsSort();  // Zahlen-keys nach hinten (hoher Index), damit ggf. ein Objekt statt ein Array entsteht
+    this.pkvsSort();  // Zahlen-keys nach hinten (hoher Index), damit ggf. ein Objekt statt ein Array entsteht und keine Objektattribute durch einen anfänglichen Array verloren gehen
     pKarr = this.pkvs[0].pathKey.split(delim);
     if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
     else obj = {};  // erster  Key = String => Objekt
@@ -201,17 +180,11 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     }));
     return this.pkvs;
   };
-  kasSort() { // sortiert die kas, so dass Zahlen-keys hinten sind
-    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
-    this.kas.sort((a, b) => this.kaSort(a, b));
-    return this.kas;
-  };
   pkvsSort() { // sortiert die kas, so dass Zahlen-keys hinten sind
     this.pkvs.sort((a, b) => this.kaSort(a.pathKey, b.pathKey));
     return this.pkvs;
   };
-
-  kaSort(ka1, ka2) {
+  kaSort(ka1, ka2) {  // Sortierfunktion für pkvsSort, vergleicht 2 Keyarrays
     // console.log("ka1", ka1, "ka2", ka2);
     if (ka1[0] === ka2[0]) {  // 1. key gleich
       if (ka1.length === 1) return -1 // keine weitere keys im 1. keyarray
