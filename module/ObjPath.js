@@ -45,7 +45,10 @@ const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // lief
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
+    console.log("op.pkvs", op.pkvs);
+    
     op[pkvsfktname].apply(op.pkvs, args);
+    console.log("op.pkvs", op.pkvs);
     let retObj = op.obj(delim);
     return retObj;
   };
@@ -89,32 +92,45 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   obj(delim = '"]["') { // erstellt zum pkvs gehöriges Objekt
     let pKarr;
     let obj;
-    
     pKarr = this.pkvs[0].pathKey.split(delim);
     if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
     else obj = {};  // erster  Key = String => Objekt
     // für jedes pkv das Objekt mit einem Unterobjekt ergänzen
     this.pkvs.forEach(pkv => {
+      console.log("+++++ pkv", pkv, "+++++");
+      
       obj = this.pkvObj(obj, pkv, delim);
+      // console.log("obj", obj);
+      return obj;
     });
     return obj;
   };
   pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {  // erstellt pkv-Subobjekt
+    console.log("--- obj", obj);
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
       obj[pkv.pathKey] = pkv.val;
     } else {  // pathKey enthält delim => Rekursion
-      const pkvCopy = JSON.parse(JSON.stringify(pkv));  // da dies nachfolgend verändert wird, während pkv unverändert bleiben soll
-      const pKarr = pkvCopy.pathKey.split(delim);
-      pkvCopy.pathKey = pKarr.slice(1).join(delim);
-      // Rekursion
-      if (pKarr[1] >= 0) {  // nächster Key = Zahl => Array
-        obj[pKarr[0]] = obj[pKarr[0]] || []; // ggf. leeres Objekt erzeugen
-        obj[pKarr[0]] = this.pkvObj(Array.from(obj[pKarr[0]]), pkvCopy, delim);
+      // Parameter pkv
+      const subPkv = JSON.parse(JSON.stringify(pkv));  // da dies nachfolgend verändert wird, während pkv unverändert bleiben soll
+      const keys = subPkv.pathKey.split(delim);  // Array der keys
+      subPkv.pathKey = keys.slice(1).join(delim); // erster key abgespalten zur neuen Objektbezeihnung keys[0]
+      // Parameter subObj
+      let key = keys[0];  // aktueller oberster key
+      let subObj = {};
+      if (Array.isArray(obj[key])) { // Array-Kopie
+        subObj = Array.from(obj[key]);
+      } else if (Object.isObject(obj[key])){  // Objekt-Kopie
+        subObj = Object.assign({}, obj[key]);
+      } else if (keys[1] >= 0) {  // nächster Key = Zahl => Array
+        subObj = []; // ggf. leeres Array erzeugen
       } else {  // nächster Key = String => Objekt
-        obj[pKarr[0]] = obj[pKarr[0]] || {}; // ggf. leeres Objekt erzeugen
-        obj[pKarr[0]] = this.pkvObj(Object.assign({}, obj[pKarr[0]]), pkvCopy, delim);
+        subObj = {}; // ggf. leeres Objekt erzeugen
       }
+      // Rekursion
+      obj[key] = this.pkvObj(subObj, subPkv, delim);
     };
+    console.log("xxx obj", obj);
+    
     return obj;
   };
   kasVonPkvs(delim = '"]["') {
@@ -238,7 +254,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   };
   keymove(key = "", steps = 1) {  // verschiebt key um steps in kas
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
-    console.log(this.kas);
     this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
       let ixKey = ka.indexOf(key);
       let ixChange = ixKey + steps;
@@ -254,7 +269,6 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       ka[ixChange] = temp;
       return ka;
     });
-    console.log(this.kas);
     // !!! hier: warum b - e?
     return this.kas;
   };
