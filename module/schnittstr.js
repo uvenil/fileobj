@@ -1,4 +1,4 @@
-console.log("--- schnittstr.js ---");
+// console.log("--- schnittstr.js ---");
 
 const reststrs = (strArr, fromTop = true) => { // Restmengenstring, => reststrs = Restmengenstring-Array = strArr ohne schnittStr
   if (!strArr.length>0) return [];

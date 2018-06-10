@@ -1,19 +1,26 @@
 // import { ObjPath, objwrap } from "./ObjPath.js";
-const { objwrap } = require("./ObjPath.js");
-const { o1, op, delim } = require("./../fixtures/o1.js");
+const { ObjPath, objwrap } = require("./ObjPath.js");
+const { o1, o2, op1, delim, arraySolve } = require("./../fixtures/o1.js");
 
 beforeEach((done) => {
   done();
 });
 
 test('sollte ObjPath erzeugen', () => {
-  expect(op.constructor.name).toBe("ObjPath");
-  expect(op).toMatchSnapshot();
+  expect(op1.constructor.name).toBe("ObjPath");
+  expect(op1).toMatchSnapshot();
   // expect(op).toIncludeKeys('pathKey', 'val');
 });
 test('sollte o1 in ObjPath verwandeln und zurück', () => {
-  o2 = op.obj(delim);
-  expect(o2).toEqual(o1);
+  const o = op1.obj(delim);
+  expect(o).toEqual(o1);
+});
+test('sollte zwei ObjPath kombinieren', () => {
+  const op2 = new ObjPath(o2, delim, arraySolve);
+  const opa = op1.assign(op2);
+  const opao = opa.obj();
+
+  expect(opao).toEqual({ ...o1, ...o2 });
 });
 test('sollte key e nach links verschieben', () => {
   const res = { a: 1, b: { '0': 6, '2': [1, 2], e: [ undefined, 5] } };
@@ -26,8 +33,8 @@ test('sollte ObjPath flatten', () => {
   const depth = 0;
   const fromTop = true;
   const joinStr = "--";
-  op.pkvsFlat(key, depth, fromTop, joinStr);
-  expect(op).toMatchSnapshot();
+  op1.pkvsFlat(key, depth, fromTop, joinStr);
+  expect(op1).toMatchSnapshot();
 });
 
 // const checkh = () => {

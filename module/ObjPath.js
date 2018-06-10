@@ -1,6 +1,6 @@
 const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
 const { filt, filter } = require('./arrayfkt');
-console.log("--- ObjPath ---");
+// console.log("--- ObjPath ---");
 
 let delim = '"]["';
 
@@ -268,6 +268,5 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
-
 module.exports = { ObjPath, objwrap };
 // export { ObjPath, objwrap };

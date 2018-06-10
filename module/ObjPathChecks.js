@@ -273,4 +273,4 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-check6();
+check9();
