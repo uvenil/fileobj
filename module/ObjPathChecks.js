@@ -1,40 +1,7 @@
-// import { ObjPath, objwrap } from "./ObjPath.js";
-const { objwrap } = require("./ObjPath.js");
-const { o1, op, delim } = require("./../fixtures/o1.js");
+const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
+const { ObjPath, objwrap } = require("./ObjPath.js");
 
-beforeEach((done) => {
-  done();
-});
-
-test('sollte ObjPath erzeugen', () => {
-  expect(op.constructor.name).toBe("ObjPath");
-  expect(op).toMatchSnapshot();
-  // expect(op).toIncludeKeys('pathKey', 'val');
-});
-test('sollte o1 in ObjPath verwandeln und zurück', () => {
-  o2 = op.obj(delim);
-  expect(o2).toEqual(o1);
-});
-test('sollte key e nach links verschieben', () => {
-  const res = { a: 1, b: { '0': 6, '2': [1, 2], e: [ undefined, 5] } };
-  const okeymove = objwrap("pkeymove");
-  let o2 = okeymove(o1, true, "e", -1);
-  expect(o2).toEqual(res);
-});
-test('sollte ObjPath flatten', () => {
-  const key = "";
-  const depth = 0;
-  const fromTop = true;
-  const joinStr = "--";
-  op.pkvsFlat(key, depth, fromTop, joinStr);
-  expect(op).toMatchSnapshot();
-});
-
-// const checkh = () => {
-// };
-// checkh();
-
-
+// Checks
 const vars = () => ({
   "o0": { "a": 1, "b": 2 },
   "o1": { "a": 1, "b": [6, { "e": 5 }, [1, 2]] },
@@ -144,7 +111,7 @@ const checkb = () => {
   console.log("o3", o3);
   let op = new ObjPath(o3);
   console.log("op", op);
-  let kf = op.kasFlatKey('e', 0, true);
+  let kf = op.kasFlat('e', 0, true);
   console.log("kf", kf);
 };
 const checka = () => {
@@ -306,3 +273,4 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
+check6();

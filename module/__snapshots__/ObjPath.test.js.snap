@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sollte ObjPath erzeugen 1`] = `
+ObjPath {
+  "kas": Array [
+    Array [
+      "a",
+    ],
+    Array [
+      "b",
+      "0",
+    ],
+    Array [
+      "b",
+      "1",
+      "e",
+    ],
+    Array [
+      "b",
+      "2",
+      "0",
+    ],
+    Array [
+      "b",
+      "2",
+      "1",
+    ],
+  ],
+  "pkeymove": [Function],
+  "pkvs": Array [
+    Object {
+      "pathKey": "a",
+      "val": 1,
+    },
+    Object {
+      "pathKey": "b\\"][\\"0",
+      "val": 6,
+    },
+    Object {
+      "pathKey": "b\\"][\\"1\\"][\\"e",
+      "val": 5,
+    },
+    Object {
+      "pathKey": "b\\"][\\"2\\"][\\"0",
+      "val": 1,
+    },
+    Object {
+      "pathKey": "b\\"][\\"2\\"][\\"1",
+      "val": 2,
+    },
+  ],
+  "pkvsFlat": [Function],
+}
+`;
+
+exports[`sollte ObjPath flatten 1`] = `
+ObjPath {
+  "kas": Array [
+    Array [
+      "a",
+    ],
+    Array [
+      "b--0",
+    ],
+    Array [
+      "b--1--e",
+    ],
+    Array [
+      "b--2--0",
+    ],
+    Array [
+      "b--2--1",
+    ],
+  ],
+  "pkeymove": [Function],
+  "pkvs": Array [
+    Object {
+      "pathKey": "a",
+      "val": 1,
+    },
+    Object {
+      "pathKey": "b--0",
+      "val": 6,
+    },
+    Object {
+      "pathKey": "b--1--e",
+      "val": 5,
+    },
+    Object {
+      "pathKey": "b--2--0",
+      "val": 1,
+    },
+    Object {
+      "pathKey": "b--2--1",
+      "val": 2,
+    },
+  ],
+  "pkvsFlat": [Function],
+}
+`;
