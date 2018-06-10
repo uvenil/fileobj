@@ -1,3 +1,5 @@
+// Die ObjPath-Klasse dient dazu Objektstrukturen zu manipulieren
+
 const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
 const { filt, filter } = require('./arrayfkt');
 // console.log("--- ObjPath ---");
