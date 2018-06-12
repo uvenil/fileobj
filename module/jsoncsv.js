@@ -8,7 +8,7 @@
   const objinout = require('./objinout');
   const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   const { schnittstr, reststrs } = require('./schnittstr');
-  // const { ObjPath, objwrap } = require("./ObjPath.js");
+  const { ObjPath, objwrap } = require("./ObjPath.js");
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -28,9 +28,9 @@
   const zuerstZeile = true;
   const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
-// Object.prototype.isObject = (testObj) => {
-//   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
-// };
+Object.prototype.isObject = (testObj) => {
+  return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
+};
 // filelist filter
 const filelist = async (ordner = ord1) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
@@ -211,17 +211,11 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   // jsonArr -> csvArr -> fileNames -> save
   let jsonZ = await jsonAusOrdner(ordner, false, exclStrings, inclStrings, filterTyp);
   let jsonS = objinout(jsonZ); // äußere Attribute mit ineren vertauschen
-  // const op = new ObjPath(jsonZ);
-  // console.log(op.kas.slice(0,20));
-  // console.log(jsonZ.slice(0,20));
-  // console.log(jsonS.slice(0,20));
-  
-  
+  const op = new ObjPath(jsonZ);
+  const objFlat = objwrap("pkvsFlat");
+  jsonZ = objFlat(jsonZ, "", depth, fromTop);
   let csvZ = csvAusJson(jsonZ, zuerstZeile); // csv erzeugen
-  let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugen
-  console.log(csvS);
-  return;
-  
+  let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugenjsonZ
   const name = inclStrings.map(el => el.replace(".", "-")).join("-");
   const fileNames = [name + "_Z", name + "_S"];  // oberste Ebene in der 1. Zeile bzw.. Spalte
   await savecsvjson({ fileNames, jsonArr: [jsonZ, jsonS], csvArr: [csvZ, csvS], savePath: resPath });
