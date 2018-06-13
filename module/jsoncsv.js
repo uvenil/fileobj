@@ -213,7 +213,10 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   let jsonS = objinout(jsonZ); // äußere Attribute mit ineren vertauschen
   const op = new ObjPath(jsonZ);
   const objFlat = objwrap("pkvsFlat");
+  let depth = 1;
+  let fromTop = true;
   jsonZ = objFlat(jsonZ, "", depth, fromTop);
+  // !!! hier: funktionier das Flatten?
   let csvZ = csvAusJson(jsonZ, zuerstZeile); // csv erzeugen
   let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugenjsonZ
   const name = inclStrings.map(el => el.replace(".", "-")).join("-");
