@@ -211,17 +211,30 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   // jsonArr -> csvArr -> fileNames -> save
   let jsonZ = await jsonAusOrdner(ordner, false, exclStrings, inclStrings, filterTyp);
   let jsonS = objinout(jsonZ); // äußere Attribute mit ineren vertauschen
-  const op = new ObjPath(jsonZ);
-  const objFlat = objwrap("pkvsFlat");
-  let depth = 1;
-  let fromTop = true;
-  jsonZ = objFlat(jsonZ, "", depth, fromTop);
-  // !!! hier: funktionier das Flatten?
   let csvZ = csvAusJson(jsonZ, zuerstZeile); // csv erzeugen
   let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugenjsonZ
   const name = inclStrings.map(el => el.replace(".", "-")).join("-");
   const fileNames = [name + "_Z", name + "_S"];  // oberste Ebene in der 1. Zeile bzw.. Spalte
   await savecsvjson({ fileNames, jsonArr: [jsonZ, jsonS], csvArr: [csvZ, csvS], savePath: resPath });
+
+  // setTimeout(() => {
+  //   console.log("2s");
+  // }, 2000);
+  const op = new ObjPath(jsonZ);
+  // op.pkvsFlat()
+  // console.log(op.kas);
+  
+  const objFlat = objwrap("pkvsFlat");
+  let depth = 1;
+  let fromTop = true;
+  let fJson = objFlat(jsonZ);//, "", depth, fromTop, "xxx");
+  let fCsv = csvAusJson(fJson, zuerstZeile); // csv erzeugen
+
+  await savecsvjson({ fileNames: ["flat"], jsonArr: [fJson], csvArr: [fCsv], savePath: resPath });
+
+  // !!! hier: funktioniert das Flatten? - ja, aber komplett?
+  // neue Funktionen in einen neuen Branch und eine eigene Funktion integrieren
+
   return jsonS;
 };
 
