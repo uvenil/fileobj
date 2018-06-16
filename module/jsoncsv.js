@@ -8,7 +8,7 @@
   const objinout = require('./objinout');
   const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   const { schnittstr, reststrs } = require('./schnittstr');
-  const { ObjPath, objwrap } = require("./ObjPath.js");
+  const { ObjPath, objwrap } = require("./ObjPath");
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -137,23 +137,49 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   if (!zuerstZ) {
     obj = objinout(obj);
     z1 = "Attr1 \\ Attr2";
-  }  
+  } 
+  let primitives = false; 
   let keys = Object.keys(obj);  // alle vorkommenden Attribute in der 1. Ebene
-  z1 = keys.reduce((a, v) => a.concat("," + String(v).replace(/,/g, '-')), z1);
+  z1 = keys.reduce((a, v) => a.concat("," + String(v).replace(/,/g, '-')), z1); // 1. Zeile
+  let z = [z1]; // Array aus den einzelnen Zeilen wird am Ende zusammengesetzt, 1. Zeile = z[0]
+  // Attribute der 2. Ebene zusammenstellen (Zeilenbeschriftungen)
   let set = new Set([]);  // alle vorkommenden Attribute in der 2. Ebene
+  let testPrim = 'typeof obj[key] === "string"';
   keys.forEach((key) => {
-    Object.keys(obj[key]).forEach((k) => set.add(k))
+    if (eval(testPrim)) {
+      primitives = true;
+    } else {
+      Object.keys(obj[key]).forEach((k) => {
+        set.add(k)
+      })
+    }
   });
-  let z = [z1];
-  let i = 1;
-  Array.from(set).map((k2) => {
-    z[i] = String(k2).replace(/,/g, '-');
-    z[i] = keys.reduce((a, v) => {
+  // Falls es primitive Werte gibt, werden diese in die 2. Zeile geschrieben
+  let i = 1;  // Zeilenindex, 1. Zeile = z[0]
+  if (primitives) {
+    i = 2;
+    let z2 = "Werte";
+    z2 = keys.reduce((a, key) => {
+      let val = ",";
+      if (eval(testPrim)) val += String(obj[key]).replace(/,/g, '-');
+      return a.concat(val);
+    }, z2);
+    // Alternativ zu reduce:
+    // keys.forEach((key) => {
+    //   z2 = z2.concat(",");
+    //   if (eval(testPrim)) z2 = z2.concat(obj[key])
+    // });
+    z[1] = z2;
+  }
+  // Werte mit 2 Schlüsseln in die Tabelle schreiben
+  Array.from(set).map((k2) => { // je 1 Zeile pro Attribut der 2. Ebene
+    z[i] = String(k2).replace(/,/g, '-'); // Zeile beginnt mit Attribut der 2. Ebene
+    z[i] = keys.reduce((a, v) => {  // Werte mit Kommata hinzufügen
       let val = obj[v][k2] || leerWert; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
       if (typeof val === "object")  val = JSON.stringify(val);  // Objekte und Arrays in json-Strings umwandeln
       return a.concat("," + String(val).replace(/,/g, '-'));
     }, z[i]);
-    i++;
+    i++;  // Index für die nächste Zeile
   });
   return z.join("\r\n");
 };
@@ -216,25 +242,20 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   const name = inclStrings.map(el => el.replace(".", "-")).join("-");
   const fileNames = [name + "_Z", name + "_S"];  // oberste Ebene in der 1. Zeile bzw.. Spalte
   await savecsvjson({ fileNames, jsonArr: [jsonZ, jsonS], csvArr: [csvZ, csvS], savePath: resPath });
-
-  // setTimeout(() => {
-  //   console.log("2s");
-  // }, 2000);
-  const op = new ObjPath(jsonZ);
-  // op.pkvsFlat()
-  // console.log(op.kas);
-  
-  let arraySolve = true;
+  // flatten
+  // const op = new ObjPath(jsonZ);
+  let arraySolve = false;
+  let key = "";
   let depth = 1;
   let fromTop = true;
   const objFlat = objwrap("pkvsFlat");
   // kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
-  let fJson = objFlat(jsonZ, arraySolve, "", depth, fromTop, "xxx");
+  let fJson = objFlat(jsonZ, arraySolve, key, depth, fromTop, "++");
   let fCsv = csvAusJson(fJson, zuerstZeile); // csv erzeugen
 
   await savecsvjson({ fileNames: ["flat"], jsonArr: [fJson], csvArr: [fCsv], savePath: resPath });
 
-  // !!! hier: funktioniert das Flatten? - ja, aber komplett?
+  // !!! hier: objpkvswrap
   // neue Funktionen in einen neuen Branch und eine eigene Funktion integrieren
 
   return jsonS;

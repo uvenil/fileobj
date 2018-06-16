@@ -60,11 +60,11 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       if (arraySolve && Array.isArray(val)) keys = [...val.keys()]  // Array
       else keys = Object.keys(val); // Objekt
       keys.forEach((k) => { // alle keys durchlaufen
-        let pK = pathKey + delimin + k; // key wird zum pathKey hinzugefügt
+        let pK = pathKey + delimin + k; // pathKey wird generiert, indem key hinzugefügt wird, wenn noch Objekt oder Array
         objPath = objPath.concat(this.pkvsVonObj(val, delim, arraySolve, pK));
       });
     } else {  // primitiver Wert: pathKey und Wert zuweisen
-      let pkv = { pathKey, val };
+      let pkv = { pathKey, val }; // generierter pathKey und val werden erst bei primitiven Wert gespeichert
       return [pkv];
     }
     return objPath;
