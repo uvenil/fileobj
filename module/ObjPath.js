@@ -35,6 +35,18 @@ const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // lief
   };
   return objfkt;
 };
+const objkaswrap = (kasfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur kasfkt zugehörige objfkt
+  let objfkt = (obj, arraySolve, ...args) => {
+    let delim = '"]["';
+    let op = new ObjPath(obj, delim, arraySolve);
+    op.kas = op.kasVonPkvs(delim);  // zunächst kas aktualisieren und flatten
+    op.kas = op[kasfktname].apply(op, args);
+    op.pkvs = op.pkvsVonKas(delim);
+    let retObj = op.obj(delim);
+    return retObj;
+  };
+  return objfkt;
+};
 class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val in pkvs bearbeitet werden und dann ein neues pkvs erzeugt werden (pkvsVonKas())
   // Umwandlung: Obj <-> ObjPath, pkvs <-> kas
   constructor(obj = {}, delim = '"]["', arraySolve = true) { //  erstellt Array mit pathKeys, val (objPath) von obj
@@ -270,5 +282,5 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
-module.exports = { ObjPath, objwrap };
+module.exports = { ObjPath, objwrap, objkaswrap };
 // export { ObjPath, objwrap };
