@@ -55,23 +55,23 @@ const checkd = () => {
   const o1 = { "a": 1, "b": [{ "e": 5 }, 6, [1, 2]] };
   const o2 = { "d": { "g": { "i": 7 }, "h": 6 }, "e": { "i": 8 } }; // "c": { "f": 5 },
   const o3 = { ...o1, ...o2 };
-  const key = "";
+  const keys = ["e", "2"];
   const depth = 1;
-  const fromTop = false;
+  const fromTop = true;
   const joinStr = "--";
   let delim;
 
   console.log("o3", o3);
   let op1 = new ObjPath(o3);
   let op2 = new ObjPath(o3);
-  let flat1 = op1.pkvsFlat(key, depth, fromTop, joinStr);
+  let flat1 = op1.pkvsFlat(keys, depth, fromTop, joinStr);
   console.log("fl1", flat1);
 
-  // op2.pkvsFlat2 = op2.pkvswrap(delim, op2.kasFlat, key, depth, fromTop, joinStr);
+  // op2.pkvsFlat2 = op2.pkvswrap(delim, op2.kasFlat, keys, depth, fromTop, joinStr);
   op2.pkvsFlat2 = op2.pkvswrap(op2.kasFlat, delim);
 
-  let flat2 = op2.pkvsFlat2(key, depth, fromTop, joinStr);
-  // let flat3 = op2.pkvsFlat2(key, depth, fromTop, joinStr);
+  let flat2 = op2.pkvsFlat2(keys, depth, fromTop, joinStr);
+  // let flat3 = op2.pkvsFlat2(keys, depth, fromTop, joinStr);
   console.log("fl2", flat2);
   // console.log("fl3", op2.pkvs);
 
@@ -273,4 +273,4 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkg();
+checkd();

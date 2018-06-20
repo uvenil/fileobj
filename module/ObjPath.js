@@ -232,11 +232,14 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     };
     return ka;
   };
-  kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
+  kasFlat(keys = [""], depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
-    this.kas.forEach(ka => {
-      this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka = keyarray
-    });
+    if (!Array.isArray(keys)) keys = [keys];  // Einzelstring in Array umwandeln
+    keys.forEach(key => {
+      this.kas.forEach(ka => {
+        this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka = keyarray
+      });
+    })
     return this.kas;
   };
   keyexchange(key = "", steps = 1) {  // tauscht einen key mit dem key aus der steps weiter liegt
