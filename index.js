@@ -1,5 +1,5 @@
 // ToDo !!!: 
-// z.B. Subobjekt nach oben holen und in Excel darstellen
+// nach Objektattributen sortierenS
 // mehr Bibliotheken einsetzen, npm Pakete analysieren
 // efs-Dateien compilen
 // nach Attributarr sortieren

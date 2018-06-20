@@ -245,12 +245,12 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   // flatten
   // const op = new ObjPath(jsonZ);
   let arraySolve = false;
-  let key = "";
+  let keys = ["scripts", "dependencies", "devDependencies"];
   let depth = 1;
   let fromTop = true;
   const objFlat = objwrap("pkvsFlat");
-  // kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
-  let fJson = objFlat(jsonZ, arraySolve, key, depth, fromTop, "++");
+  // kasFlat(keys = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
+  let fJson = objFlat(jsonZ, arraySolve, keys, depth, fromTop, "++");
   let fCsv = csvAusJson(fJson, zuerstZeile); // csv erzeugen
 
   await savecsvjson({ fileNames: ["flat"], jsonArr: [fJson], csvArr: [fCsv], savePath: resPath });

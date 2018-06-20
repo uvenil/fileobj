@@ -1,0 +1,119 @@
+GesNr.,,3,4,5,6,7,8,9,13,14
+Nr,,1,1,2,3,3,4,4,5,5
+Kurzname,,Mead Node,Mead Node,Mead React,Grider Fullstack,Grider Fullstack,Grider Redux,Grider Redux,Traversy Mongo,Traversy Mongo
+name,,node-chat-app,node-todo-api,expensify,server,client,server,redux-simple-starter,vidjot,storybooks
+Attr2 \ Attr1,Anz,n-9-23-private-messages,n-10-05-after-async-await-in-todo-api,r-19-12-final-deployment,FullstackReactCode/server,FullstackReactCode/server/client,AdvancedReduxCode/auth/server,AdvancedReduxCode/auth/client,vidjot,storybooks
+author,3,---,---,Andrew Mead,---,---,---,---,Brad Traversy,Brad Traversy
+dependencies++axios,2,---,---,---,---,^0.16.2,---,^0.9.1,---,---
+dependencies++babel-cli,1,---,---,6.24.1,---,---,---,---,---,---
+dependencies++babel-core,1,---,---,6.25.0,---,---,---,---,---,---
+dependencies++babel-loader,1,---,---,7.1.1,---,---,---,---,---,---
+dependencies++babel-plugin-transform-class-properties,1,---,---,6.24.1,---,---,---,---,---,---
+dependencies++babel-plugin-transform-object-rest-spread,1,---,---,6.23.0,---,---,---,---,---,---
+dependencies++babel-polyfill,1,---,---,6.26.0,---,---,---,---,---,---
+dependencies++babel-preset-env,1,---,---,1.5.2,---,---,---,---,---,---
+dependencies++babel-preset-react,1,---,---,6.24.1,---,---,---,---,---,---
+dependencies++babel-preset-stage-1,1,---,---,---,---,---,---,^6.1.18,---,---
+dependencies++bcrypt-nodejs,1,---,---,---,---,---,0.0.3,---,---,---
+dependencies++bcryptjs,2,---,^2.3.0,---,---,---,---,---,^2.4.3,---
+dependencies++body-parser,5,---,^1.15.2,---,^1.17.2,---,^1.15.0,---,^1.18.1,^1.18.1
+dependencies++concurrently,1,---,---,---,^3.5.0,---,---,---,---,---
+dependencies++connect-flash,1,---,---,---,---,---,---,---,^0.1.1,---
+dependencies++cookie-parser,1,---,---,---,---,---,---,---,---,^1.4.3
+dependencies++cookie-session,1,---,---,---,^2.0.0-beta.2,---,---,---,---,---
+dependencies++cors,1,---,---,---,---,---,^2.7.1,---,---,---
+dependencies++crypto-js,1,---,^3.1.6,---,---,---,---,---,---,---
+dependencies++css-loader,1,---,---,0.28.4,---,---,---,---,---,---
+dependencies++express,7,^4.14.0,^4.14.0,4.15.4,^4.15.3,---,^4.13.4,---,^4.15.4,^4.15.4
+dependencies++express-handlebars,2,---,---,---,---,---,---,---,^3.0.0,^3.0.0
+dependencies++express-session,2,---,---,---,---,---,---,---,^1.15.5,^1.15.5
+dependencies++extract-text-webpack-plugin,1,---,---,3.0.0,---,---,---,---,---,---
+dependencies++firebase,1,---,---,4.2.0,---,---,---,---,---,---
+dependencies++history,1,---,---,4.7.2,---,---,---,---,---,---
+dependencies++jsonwebtoken,1,---,^7.1.9,---,---,---,---,---,---,---
+dependencies++jwt-simple,1,---,---,---,---,---,^0.5.0,---,---,---
+dependencies++localtunnel,1,---,---,---,^1.8.3,---,---,---,---,---
+dependencies++lodash,3,---,^4.15.0,---,^4.17.4,---,---,^3.10.1,---,---
+dependencies++materialize-css,1,---,---,---,---,^0.99.0,---,---,---,---
+dependencies++method-override,2,---,---,---,---,---,---,---,^2.3.9,^2.3.9
+dependencies++moment,3,^2.15.1,---,2.18.1,---,---,---,---,---,^2.18.1
+dependencies++mongodb,1,---,^2.2.5,---,---,---,---,---,---,---
+dependencies++mongoose,5,---,^4.5.9,---,^4.11.1,---,^4.4.7,---,^4.11.12,^4.11.12
+dependencies++morgan,1,---,---,---,---,---,^1.7.0,---,---,---
+dependencies++node-sass,1,---,---,4.5.3,---,---,---,---,---,---
+dependencies++nodemon,2,---,---,---,^1.11.0,---,^1.9.1,---,---,---
+dependencies++normalize.css,1,---,---,7.0.0,---,---,---,---,---,---
+dependencies++numeral,1,---,---,2.0.6,---,---,---,---,---,---
+dependencies++passport,4,---,---,---,^0.3.2,---,^0.3.2,---,^0.4.0,^0.4.0
+dependencies++passport-google-oauth20,2,---,---,---,^1.0.0,---,---,---,---,^1.0.0
+dependencies++passport-jwt,1,---,---,---,---,---,^2.0.0,---,---,---
+dependencies++passport-local,2,---,---,---,---,---,^1.0.0,---,^1.0.0,---
+dependencies++path-parser,1,---,---,---,^2.0.2,---,---,---,---,---
+dependencies++react,3,---,---,15.6.1,---,^16.0.0-alpha.13,---,^0.14.3,---,---
+dependencies++react-addons-shallow-compare,1,---,---,15.6.0,---,---,---,---,---,---
+dependencies++react-dates,1,---,---,12.3.0,---,---,---,---,---,---
+dependencies++react-dom,3,---,---,15.6.1,---,^16.0.0-alpha.13,---,^0.14.3,---,---
+dependencies++react-modal,1,---,---,2.2.2,---,---,---,---,---,---
+dependencies++react-redux,3,---,---,5.0.5,---,^5.0.5,---,^4.0.0,---,---
+dependencies++react-router,1,---,---,---,---,---,---,^2.0.1,---,---
+dependencies++react-router-dom,2,---,---,4.1.2,---,^4.1.1,---,---,---,---
+dependencies++react-scripts,1,---,---,---,---,1.0.10,---,---,---,---
+dependencies++react-stripe-checkout,1,---,---,---,---,^2.4.0,---,---,---,---
+dependencies++redux,3,---,---,3.7.2,---,^3.7.1,---,^3.0.4,---,---
+dependencies++redux-form,2,---,---,---,---,^7.0.1,---,^5.0.1,---,---
+dependencies++redux-mock-store,1,---,---,1.2.3,---,---,---,---,---,---
+dependencies++redux-thunk,3,---,---,2.2.0,---,^2.2.0,---,^2.0.1,---,---
+dependencies++request,0,---,---,---,---,---,---,---,---,---
+dependencies++sass-loader,1,---,---,6.0.6,---,---,---,---,---,---
+dependencies++sendgrid,1,---,---,---,^5.1.2,---,---,---,---,---
+dependencies++socket.io,1,^1.4.8,---,---,---,---,---,---,---,---
+dependencies++stripe,1,---,---,---,^4.23.1,---,---,---,---,---
+dependencies++style-loader,1,---,---,0.18.2,---,---,---,---,---,---
+dependencies++uuid,1,---,---,3.1.0,---,---,---,---,---,---
+dependencies++validator,2,---,^5.6.0,8.0.0,---,---,---,---,---,---
+dependencies++webpack,1,---,---,3.1.0,---,---,---,---,---,---
+dependencies++yargs,0,---,---,---,---,---,---,---,---,---
+description,3,---,---,---,---,---,---,Simple starter package for Redux with React and Babel support,App to create video ideas,App to share public or write private stories
+devDependencies++babel-core,1,---,---,---,---,---,---,^6.2.1,---,---
+devDependencies++babel-loader,1,---,---,---,---,---,---,^6.2.0,---,---
+devDependencies++babel-preset-es2015,1,---,---,---,---,---,---,^6.1.18,---,---
+devDependencies++babel-preset-react,1,---,---,---,---,---,---,^6.1.18,---,---
+devDependencies++chai,1,---,---,---,---,---,---,^3.5.0,---,---
+devDependencies++chai-jquery,1,---,---,---,---,---,---,^2.0.0,---,---
+devDependencies++cross-env,1,---,---,5.0.5,---,---,---,---,---,---
+devDependencies++dotenv,1,---,---,4.0.0,---,---,---,---,---,---
+devDependencies++enzyme,1,---,---,2.9.1,---,---,---,---,---,---
+devDependencies++enzyme-to-json,1,---,---,1.5.1,---,---,---,---,---,---
+devDependencies++expect,2,^1.20.2,^1.20.2,---,---,---,---,---,---,---
+devDependencies++jest,1,---,---,20.0.4,---,---,---,---,---,---
+devDependencies++jquery,1,---,---,---,---,---,---,^2.2.1,---,---
+devDependencies++jsdom,1,---,---,---,---,---,---,^8.1.0,---,---
+devDependencies++mocha,3,^3.0.2,^3.0.2,---,---,---,---,^2.4.5,---,---
+devDependencies++nodemon,2,^1.10.2,^1.10.2,---,---,---,---,---,---,---
+devDependencies++react-addons-test-utils,1,---,---,---,---,---,---,^0.14.7,---,---
+devDependencies++react-test-renderer,1,---,---,15.6.1,---,---,---,---,---,---
+devDependencies++supertest,1,---,^2.0.0,---,---,---,---,---,---,---
+devDependencies++webpack,1,---,---,---,---,---,---,^1.12.9,---,---
+devDependencies++webpack-dev-server,2,---,---,2.5.1,---,---,---,^1.14.0,---,---
+engines,3,"{""node"":""6.2.2""}","{""node"":""6.2.2""}",---,"{""node"":""8.1.1""-""npm"":""5.0.3""}",---,---,---,---,---
+license,8,ISC,ISC,MIT,ISC,---,ISC,ISC,MIT,MIT
+main,8,index.js,index.js,index.js,index.js,---,index.js,index.js,app.js,app.js
+,9,,,,,,,,,
+private,1,---,---,---,---,true,---,---,---,---
+proxy,1,---,---,---,---,"{""/auth/google"":{""target"":""http://localhost:5000""}-""/api/*"":{""target"":""http://localhost:5000""}}",---,---,---,---
+repository,1,---,---,---,---,---,---,git@github.com:StephenGrider/ReduxSimpleStarter.git,---,---
+scripts++build,1,---,---,---,---,react-scripts build,---,---,---,---
+scripts++build:dev,1,---,---,webpack,---,---,---,---,---,---
+scripts++build:prod,1,---,---,webpack -p --env production,---,---,---,---,---,---
+scripts++client,1,---,---,---,npm run start --prefix client,---,---,---,---,---
+scripts++dev,2,---,---,---,"concurrently ""npm run server"" ""npm run client"" ""npm run webhook""",---,nodemon index.js,---,---,---
+scripts++dev-server,1,---,---,webpack-dev-server,---,---,---,---,---,---
+scripts++eject,1,---,---,---,---,react-scripts eject,---,---,---,---
+scripts++heroku-postbuild,2,---,---,yarn run build:prod,NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client,---,---,---,---,---
+scripts++server,1,---,---,---,nodemon index.js,---,---,---,---,---
+scripts++start,8,node server/server.js,node server/server.js,node server/server.js,node index.js,react-scripts start,---,node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js,node app.js,node app.js
+scripts++test,6,mocha server/**/*.test.js,export NODE_ENV=test || SET NODE_ENV=test && mocha server/**/*.test.js,cross-env NODE_ENV=test jest --config=jest.config.json,---,react-scripts test --env=jsdom,"echo ""Error: no test specified"" && exit 1",mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive ./test,---,---
+scripts++test-watch,2,nodemon --exec 'npm test',nodemon --exec 'npm test',---,---,---,---,---,---,---
+scripts++test:watch,1,---,---,---,---,---,---,npm run test -- --watch,---,---
+scripts++webhook,1,---,---,---,./sendgrid_webhook.sh,---,---,---,---,---
+version,9,1.0.0,1.0.0,1.0.0,1.0.0,0.1.0,1.0.0,1.0.0,1.0.0,1.0.0
