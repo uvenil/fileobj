@@ -235,7 +235,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
   kasFlat(key = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
     if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
     this.kas.forEach(ka => {
-      this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka
+      this.kaFlat(ka, key, depth, fromTop, joinStr);  // flattet ka = keyarray
     });
     return this.kas;
   };

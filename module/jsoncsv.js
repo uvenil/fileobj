@@ -255,9 +255,6 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
 
   await savecsvjson({ fileNames: ["flat"], jsonArr: [fJson], csvArr: [fCsv], savePath: resPath });
 
-  // !!! hier: objpkvswrap
-  // neue Funktionen in einen neuen Branch und eine eigene Funktion integrieren
-
   return jsonS;
 };
 
