@@ -25,6 +25,7 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
 Object.prototype.isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
+const sortObject = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {}); // modifiziert von https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key#5467142
 const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
@@ -285,5 +286,5 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
-module.exports = { ObjPath, objwrap, objkaswrap };
+module.exports = { ObjPath, objwrap, objkaswrap, sortObject };
 // export { ObjPath, objwrap };

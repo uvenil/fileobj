@@ -1,5 +1,5 @@
 const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
-const { ObjPath, objwrap, objkaswrap } = require("./ObjPath.js");
+const { ObjPath, objwrap, objkaswrap, sortObject } = require("./ObjPath.js");
 
 // Checks
 const vars = () => ({
@@ -15,6 +15,16 @@ const vars = () => ({
   "depth": 1,
   "fromTop": true,
 });
+const checkh = () => {
+  console.log("- check -");
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
+  const o = { "b": 2, "a": 1 };
+  const os = sortObject(o);
+
+  console.log("o", o);
+  console.log("os", os);
+};
 const checkg = () => {
   console.log("- check -");
   const v = vars();
@@ -273,4 +283,4 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkd();
+checkh();
