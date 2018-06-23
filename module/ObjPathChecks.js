@@ -15,6 +15,16 @@ const vars = () => ({
   "depth": 1,
   "fromTop": true,
 });
+const checki = () => {
+  console.log("- check -");
+  const v = vars();
+  o3 = { ...v.o1, ...v.o2 };
+  const ofkt = objkaswrap("keyrename");
+
+  let o4 = ofkt(o3, true, "e", "b");
+  console.log("o3", o3);
+  console.log("o4", o4);
+};
 const checkh = () => {
   console.log("- check -");
   const v = vars();
@@ -283,4 +293,4 @@ const check9 = () => {
   console.log("opao", opao);
   console.log("o3", o3);
 };
-checkh();
+checki();

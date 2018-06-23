@@ -89,16 +89,19 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     pKarr = this.pkvs[0].pathKey.split(delim);
     if (pKarr[0] >= 0) obj = []  // erster Key = Zahl => Array
     else obj = {};  // erster  Key = String => Objekt
-    // für jedes pkv das Objekt mit einem Unterobjekt ergänzen
-    this.pkvs.forEach(pkv => {
-      obj = this.pkvObj(obj, pkv, delim);
-      return obj;
-    });
+    // pkv-Subobjekte in obj zusammenführen
+    obj = this.pkvs.reduce((r, pkv) => (r = this.pkvObj(obj, pkv, delim), r), obj);
+    // Alternativ: für jedes pkv das Objekt mit einem Unterobjekt ergänzen
+    // this.pkvs.forEach(pkv => {
+    //   obj = this.pkvObj(obj, pkv, delim);
+    //   return obj;
+    // });
     return obj;
   };
-  pkvObj(obj = {}, pkv = { pathKey: "", val: null }, delim = '"]["') {  // erstellt pkv-Subobjekt
+  pkvObj(obj, pkv = { pathKey: "", val: null }, delim = '"]["') {  // erstellt pkv-Subobjekt
     if (pkv.pathKey.indexOf(delim) === -1) { // kein delim im pathKey => direkte Zuordnung
-      obj[pkv.pathKey] = pkv.val;
+      if (!obj[pkv.pathKey])  obj[pkv.pathKey] = pkv.val
+      else obj["wert"] = pkv.val; // schon Wert vorhanden => in Attribut "wert" speichern
     } else {  // pathKey enthält delim => Rekursion
       // Parameter subPkv
       const subPkv = JSON.parse(JSON.stringify(pkv));  // da dies nachfolgend verändert wird, während pkv unverändert bleiben soll
@@ -106,11 +109,13 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       subPkv.pathKey = keys.slice(1).join(delim); // erster key abgespalten zur neuen Objektbezeihnung keys[0]
       // Parameter subObj
       let key = keys[0];  // aktueller oberster key
-      let subObj = {};
+      let subObj;
       if (Array.isArray(obj[key])) { // Array-Kopie
         subObj = Array.from(obj[key]);
-      } else if (Object.isObject(obj[key])){  // Objekt-Kopie
+      } else if (Object.isObject(obj[key])) {  // Objekt-Kopie
         subObj = Object.assign({}, obj[key]);
+      } else if (obj[key]) {  // schon einfacher Wert vorhanden => in Attribut "wert" speichern
+        subObj = { "wert": obj[key] };
       } else if (keys[1] >= 0) {  // nächster Key = Zahl => Array
         subObj = []; // ggf. leeres Array erzeugen
       } else {  // nächster Key = String => Objekt
@@ -272,6 +277,15 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
         i += step;
       }
       ka[ixChange] = temp;
+      return ka;
+    });
+    return this.kas;
+  };
+  keyrename(key = "", keyNeu = "") {  // tauscht einen key mit dem key aus der steps weiter liegt
+    if (!this.kas || this.kas.length === 0) this.kasVonPkvs();
+    this.kas.filter(ka => ka.indexOf(key) !== -1).map(ka => {
+      let ixKey = ka.indexOf(key);
+      ka[ixKey] = keyNeu;
       return ka;
     });
     return this.kas;
