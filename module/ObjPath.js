@@ -22,7 +22,7 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
   }
   return flatArr;
 };
-Object.prototype.isObject = (testObj) => {
+const isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 const sortObject = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {}); // modifiziert von https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key#5467142
@@ -36,7 +36,7 @@ const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // lief
   };
   return objfkt;
 };
-const objkaswrap = (kasfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur kasfkt zugehörige objfkt
+const objkaswrap = (kasfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur kasfkt zugehörige objfkt, verwendet die kas-Funktionen von ObjPath (kasflat, keyexchange, keymove, keyrename)
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
@@ -69,7 +69,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     }
     let keys = [];
     let objPath = [];
-    if (Object.isObject(val) || (arraySolve && Array.isArray(val))) { // val = Objekt oder Array: Keys ermitteln und durchlaufen
+    if (isObject(val) || (arraySolve && Array.isArray(val))) { // val = Objekt oder Array: Keys ermitteln und durchlaufen
       if (arraySolve && Array.isArray(val)) keys = [...val.keys()]  // Array
       else keys = Object.keys(val); // Objekt
       keys.forEach((k) => { // alle keys durchlaufen
@@ -112,7 +112,7 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
       let subObj;
       if (Array.isArray(obj[key])) { // Array-Kopie
         subObj = Array.from(obj[key]);
-      } else if (Object.isObject(obj[key])) {  // Objekt-Kopie
+      } else if (isObject(obj[key])) {  // Objekt-Kopie
         subObj = Object.assign({}, obj[key]);
       } else if (obj[key]) {  // schon einfacher Wert vorhanden => in Attribut "wert" speichern
         subObj = { "wert": obj[key] };
@@ -300,5 +300,5 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
-module.exports = { ObjPath, objwrap, objkaswrap, sortObject };
+module.exports = { ObjPath, objkaswrap, objwrap, sortObject, isObject };
 // export { ObjPath, objwrap };

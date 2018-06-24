@@ -11,7 +11,7 @@
   "author": "uvenil",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^6.0.0",
-    "jest": "^23.0.0"
+    "fs-extra": "^6.0.1",
+    "jest": "^23.1.0"
   }
 }

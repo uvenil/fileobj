@@ -1,5 +1,6 @@
 // Importe
   'use strict'
+  
   const fs = require('fs-extra');
   const path = require('path');
   const { promisify } = require('util');
@@ -8,7 +9,7 @@
   const objinout = require('./objinout');
   const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   const { schnittstr, reststrs } = require('./schnittstr');
-  const { ObjPath, objwrap } = require("./ObjPath");
+  const { objwrap } = require("./ObjPath");
   // const el = (v) => { console.log(`-> ${v}: ${eval(v)}`); }; // Eval-Logger Kurzform, Aufruf: el("v"); v = zu loggende Variable
 
   const aktFile = path.basename(__filename);
@@ -28,9 +29,6 @@
   const zuerstZeile = true;
   const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
-Object.prototype.isObject = (testObj) => {
-  return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
-};
 // filelist filter
 const filelist = async (ordner = ord1) => { // liest alle Dateipfade aus dem Ordner ordner und seinen Unterordnern 
   try {
