@@ -26,7 +26,7 @@ const isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 const sortObject = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {}); // modifiziert von https://stackoverflow.com/questions/5467129/sort-javascript-object-by-key#5467142
-const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
+const objpwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur pkvsfkt zugehörige objfkt
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
@@ -36,7 +36,7 @@ const objwrap = (pkvsfktname, obj = {}, arraySolve = true, ...args) => { // lief
   };
   return objfkt;
 };
-const objkaswrap = (kasfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur kasfkt zugehörige objfkt, verwendet die kas-Funktionen von ObjPath (kasflat, keyexchange, keymove, keyrename)
+const objwrap = (kasfktname, obj = {}, arraySolve = true, ...args) => { // liefert zur kasfkt zugehörige objfkt, verwendet die kas-Funktionen von ObjPath (kasflat, keyexchange, keymove, keyrename)
   let objfkt = (obj, arraySolve, ...args) => {
     let delim = '"]["';
     let op = new ObjPath(obj, delim, arraySolve);
@@ -300,5 +300,5 @@ class ObjPath { // früher AttrPath, Vorteil: kas kann unabhängig von den val i
     return this.pkvs;
   };
 };
-module.exports = { ObjPath, objkaswrap, objwrap, sortObject, isObject };
-// export { ObjPath, objwrap };
+module.exports = { ObjPath, objwrap, objpwrap, sortObject, isObject };
+// export { ObjPath, objpwrap };

@@ -19,7 +19,7 @@ Array.prototype.flat = (nestedArr = [[]], depth = 0) => { // rekusiv, ersetzt fl
   }
   return flatArr;
 };
-Object.prototype.isObject = (testObj) => {
+const isObject = (testObj) => {
   return (typeof testObj === "object" && !Array.isArray(testObj) && !!Object.keys(testObj)[0]);
 };
 
@@ -62,7 +62,7 @@ const attrPathFromObj = (obj = {}, delimin = '"]["', pathKey = "", attrPath = []
       val: obj[key]
     });
     // rekursiv
-    if (Object.isObject(obj[key])) {
+    if (isObject(obj[key])) {
       attrPath = attrPathFromObj(obj[key], delimin, pathKey + delim + key, Array.from(attrPath));
     }
   });
@@ -73,7 +73,7 @@ const objFromAttrPath = (attrPath, delim = '"]["') => { //
   let uoAttrPath = [];
   let ebenenAttr = attrPath.filter(pa => pa.pathKey.indexOf(delim) === -1); // nur die erste Ebene, deren pathKey kein delim enthält
   ebenenAttr.forEach(pa => {
-    if (Object.isObject(pa.val)) {
+    if (isObject(pa.val)) {
       uoAttrPath = attrPath.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
       uoAttrPath = uoAttrPath.map(pa => ({
         pathKey: pa.pathKey.split(delim).slice(1).join(delim),  // 1. Ebene vom pathKey entfernen
@@ -132,7 +132,7 @@ const objpath = (obj = {}) => {  // liefert ein Array aller Unterobjekte (untero
       aktObj = uo["unterobj"];
       uo["propAttr"] = objPropAttr(aktObj, uo["objPathKey"])  // neues Objekt-Array definieren und daraus Ebenen-Array der nächsten Ebene machen
       // Unterobjekt-Keys finden die weitere Unterobjekte enthalten
-      nextObjKeys = Object.keys(aktObj).filter(key => Object.isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
+      nextObjKeys = Object.keys(aktObj).filter(key => isObject(aktObj[key])); // Objekt-Keys der nächsten Ebene des aktuellen Objects
       // console.log(nextObjKeys);
       if (nextObjKeys.length > 0) { // falls es Unterobjekte zum aktuellen Objekt gibt
         nextUnterObjects = nextObjKeys.map((key) => ({ // keys durch Objekte austauschen
@@ -157,7 +157,7 @@ const objFromPropAttrAlt = (propAttrArr) => { // tiefer Objektaufbau vom Array m
   const obj = {};
   // alle Keys im neuen Objekt von oben nach unten erzeugen, erzeugt leere Objekte
   propAttrArr.forEach(pa => {
-    if (Object.isObject(pa.val) === true) eval('obj["' + pa.pathKey + '"] = {}') // beim Objekt als Wert wird ein leeres Objekt erzeugt
+    if (isObject(pa.val) === true) eval('obj["' + pa.pathKey + '"] = {}') // beim Objekt als Wert wird ein leeres Objekt erzeugt
     else eval('obj["' + pa.pathKey + '"] = ' + pa.val); // bei Nicht-Objekt als Wert wird dieser dem Kex zugewiesen
   });
   return obj;
@@ -173,7 +173,7 @@ const objFromPropAttr = (propAttrArr) => { // tiefer Objektaufbau vom Array mit 
   ebenenAttr.forEach(pa => {
     pathArr = pa.pathKey.split(delim);
     key = pathArr[pathArr.length - 1];
-    if (Object.isObject(pa.val)) {
+    if (isObject(pa.val)) {
       uoPropAttr = propAttrArr.filter(upa => upa.pathKey.startsWith(pa.pathKey + delim));
 
       obj[key] = objFromPropAttr(uoPropAttr) // beim Objekt wird rekursiv die aktuelle Funktion aufgerufen

@@ -5,7 +5,6 @@
 // ToDo !!!: 
 // react Prototyp testen
 // mehr Bibliotheken einsetzen, npm Pakete analysieren
-// evtl. statische Fkt wie Object.isObject() von Object lösen
 // evtl. bessere Module packen, z.B. Fkt. sortObject aus ObjPath herausnehmen
 
 // efs-Dateien compilen

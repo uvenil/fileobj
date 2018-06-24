@@ -1,5 +1,5 @@
 const { reststrs, schnittstr, schnitthits } = require('./schnittstr');
-const { ObjPath, objwrap, objkaswrap, sortObject } = require("./ObjPath.js");
+const { ObjPath, objwrap, sortObject } = require("./ObjPath.js");
 
 // Checks
 const vars = () => ({
@@ -19,7 +19,7 @@ const checki = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const ofkt = objkaswrap("keyrename");
+  const ofkt = objwrap("keyrename");
 
   let o4 = ofkt(o3, true, "e", "b");
   console.log("o3", o3);
@@ -39,7 +39,7 @@ const checkg = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const okeymove = objkaswrap("keyexchange");
+  const okeymove = objwrap("keyexchange");
 
   let o4 = okeymove(o3, true, "d", 1);
   console.log("o3", o3);
@@ -49,7 +49,7 @@ const checkf = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const okeymove = objwrap("pkeymove");
+  const okeymove = objwrap("keymove");
 
   let o4 = okeymove(o3, true, "e", -1);
   console.log("o3", o3);

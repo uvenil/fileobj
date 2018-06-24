@@ -246,7 +246,7 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   let keys = ["scripts", "dependencies", "devDependencies"];
   let depth = 1;
   let fromTop = true;
-  const objFlat = objwrap("pkvsFlat");
+  const objFlat = objwrap("kasFlat");
   // kasFlat(keys = "", depth = 0, fromTop = true, joinStr = "--") { // flatted die Keyarrays (kas, PathKeys) komplett (depth=0) oder um depth Ebenen
   let fJson = objFlat(jsonZ, arraySolve, keys, depth, fromTop, "++");
   let fCsv = csvAusJson(fJson, zuerstZeile); // csv erzeugen

@@ -24,7 +24,7 @@ test('sollte zwei ObjPath kombinieren', () => {
 });
 test('sollte key e nach links verschieben', () => {
   const res = { a: 1, b: { '0': 6, '2': [1, 2], e: [ undefined, 5] } };
-  const okeymove = objwrap("pkeymove");
+  const okeymove = objwrap("keymove");
   let o2 = okeymove(o1, true, "e", -1);
   expect(o2).toEqual(res);
 });
@@ -59,7 +59,7 @@ const checkg = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const okeymove = objwrap("pkeymove");
+  const okeymove = objwrap("keymove");
 
   let o4 = okeymove(o3, true, "e", -1);
   console.log("o3", o3);
@@ -69,7 +69,7 @@ const checkf = () => {
   console.log("- check -");
   const v = vars();
   o3 = { ...v.o1, ...v.o2 };
-  const okeymove = objwrap("pkeymove");
+  const okeymove = objwrap("keymove");
 
   let o4 = okeymove(o3, true, "e", -1);
   console.log("o3", o3);
