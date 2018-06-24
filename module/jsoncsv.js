@@ -3,10 +3,10 @@
   
   const fs = require('fs-extra');
   const path = require('path');
+  const objinout = require('obj-inout');
   const { promisify } = require('util');
 
   const readDir = require('./readdir');
-  const objinout = require('./objinout');
   const { filterEx, filterIn, keyArrObj } = require('./arrayfkt');
   const { schnittstr, reststrs } = require('./schnittstr');
   const { objwrap } = require("./ObjPath");
@@ -291,8 +291,9 @@ const check3 = () => {
 };
 const check4 = () => {
   const o = { "a": "1", "b": "2" };
-  const io = objinout(o);
-  console.log("o",o);
+  const o2 = { "a": {"c":"1"}, "b": {"c":"2"} };
+  const io = objinout(o2);
+  console.log("o2",o2);
   console.log("io",io);
 };
 check4();
