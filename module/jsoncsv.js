@@ -188,6 +188,22 @@ const savecsvjson = async ({ fileNames, jsonArr, csvArr, savePath = resPath }) =
     await fs.writeFile(path.join(savePath, el + '.csv'), csvArr[ix]); // csv-Datei speichern
   });
 };
+const savecsvjson2 = async (namejsoncsv = [{ name, json, csv }], savePath = resPath) => {
+  if (!fs.existsSync(savePath)) fs.mkdirSync(path.resolve(savePath)); // Ergebnispfad erzeugen
+  namejsoncsv.forEach(async ({ name, json, csv }) => {
+    await fs.writeJson(path.join(savePath, name + '.json'), json);
+    await fs.writeFile(path.join(savePath, name + '.csv'), csv); // csv-Datei speichern
+  });
+};
+const savejsoncsv = async (namejson = [{ name, json }], savePath = resPath, zuerstZ = false) => {
+  if (!fs.existsSync(savePath)) fs.mkdirSync(path.resolve(savePath)); // Ergebnispfad erzeugen
+  let csv;
+  namejson.forEach(async ({ name, json, csv }) => {
+    csv = csvAusJson(json, zuerstZ);
+    await fs.writeJson(path.join(savePath, name + '.json'), json);
+    await fs.writeFile(path.join(savePath, name + '.csv'), csv); // csv-Datei speichern
+  });
+};
 
 // arr-csv und obj-csv-inout
 const csvinoutOrg = async (ordner = ord6, exclStrings = exclPfadStrings, inclStrings = inclPfadStrings, filterTyp = 0) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
@@ -256,5 +272,28 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   return jsonS;
 };
 
-makecsvinout();
-module.exports = { jsonAusOrdner, csvAusJson, savecsvjson, filelistfilter };
+// makecsvinout();
+const check2 = () => {
+  const name = "test1";
+  const json = { "a": "1", "b": "2" };
+  const csv = csvAusJson(json, true);
+  const savePath = ord3;
+  savecsvjson2([{ name, json, csv }], savePath);
+  console.log("saved");
+};
+const check3 = () => {
+  const name = "test3";
+  const json = { "a": "1", "b": "2" };
+  const savePath = ord3;
+  const zuerstZ = true;
+  savejsoncsv([{ name, json }], savePath, zuerstZ);
+  console.log("saved");
+};
+const check4 = () => {
+  const o = { "a": "1", "b": "2" };
+  const io = objinout(o);
+  console.log("o",o);
+  console.log("io",io);
+};
+check4();
+module.exports = { jsonAusOrdner, csvAusJson, savecsvjson, savecsvjson2, filelistfilter };
