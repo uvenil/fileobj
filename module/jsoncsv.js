@@ -23,9 +23,10 @@
   const ord4 = "/home/micha/Schreibtisch/werkma/modulema";
   const ord5 = "/home/micha/Schreibtisch/VSC-Arbeitsbereiche";
   const ord6 = "/home/micha/Schreibtisch/UdemyNodeReact";
+  const ord7 = "/home/micha/Schreibtisch/tests/jsonZuCsv";
   const resPath = ord3;
   const exclPfadStrings = ["node_modules", "alt"];  // es werden auch Teile von Pfaden (Dateiname+Ordner) durchsucht,  z.B. nicht verwendete Ordner
-  const inclPfadStrings = ["package.json"]; // es werden auch Teile von Pfaden (Dateiname+Ordner) durchsucht,  z.B. gesuchte Dateinamen
+  const inclPfadStrings = ["res-test1.json", "res-test2.json", "res-test3.json"]; // es werden auch Teile von Pfaden (Dateiname+Ordner) durchsucht,  z.B. gesuchte Dateinamen
   const zuerstZeile = true;
   const leerWert = "---"; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
 
@@ -123,7 +124,9 @@ const jsonAusOrdner = async ( ordner = ord1, bArray = false,
   if (bArray) return {jsonArr, filteredList};
   // json-Objekt erzeugen
   let indArr = reststrs(filteredList);  // Array mit relativen Dateipfaden wird zu den keys
-  indArr = reststrs(indArr);  // ggf. erneut gleichen String entfernen
+  if (indArr[0].length>20){
+    indArr = reststrs(indArr);  // ggf. erneut gleichen String entfernen
+  }
   // const indArr = filteredList.map((el) => path.basename(el));  // Array mit relativen Dateipfaden wird zu den keys
   // console.log("indArr",indArr);
   const jsonObj = keyArrObj(jsonArr, indArr); // Objekt aus json-Objekten mit keys indArr
@@ -142,7 +145,7 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   let z = [z1]; // Array aus den einzelnen Zeilen wird am Ende zusammengesetzt, 1. Zeile = z[0]
   // Attribute der 2. Ebene zusammenstellen (Zeilenbeschriftungen)
   let set = new Set([]);  // alle vorkommenden Attribute in der 2. Ebene
-  let testPrim = 'typeof obj[key] === "string"';
+  let testPrim = 'typeof obj[key] === "string"';  // Test auf primitiven Wert
   keys.forEach((key) => {
     if (eval(testPrim)) {
       primitives = true;
@@ -159,7 +162,7 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
     let z2 = "Werte";
     z2 = keys.reduce((a, key) => {
       let val = ",";
-      if (eval(testPrim)) val += String(obj[key]).replace(/,/g, '-');
+      if (eval(testPrim)) val += String(obj[key]).replace(/,|;/g, '-');
       return a.concat(val);
     }, z2);
     // Alternativ zu reduce:
@@ -171,11 +174,11 @@ const csvAusJson = (jsonObj, zuerstZ = true) => { // erstellt aus einem verschac
   }
   // Werte mit 2 Schlüsseln in die Tabelle schreiben
   Array.from(set).map((k2) => { // je 1 Zeile pro Attribut der 2. Ebene
-    z[i] = String(k2).replace(/,/g, '-'); // Zeile beginnt mit Attribut der 2. Ebene
+    z[i] = String(k2).replace(/,|;/g, '-'); // Zeile beginnt mit Attribut der 2. Ebene
     z[i] = keys.reduce((a, v) => {  // Werte mit Kommata hinzufügen
       let val = obj[v][k2] || leerWert; // Leer-Wert, falls Schlüssel in diesem Objekt nicht existiert
       if (typeof val === "object")  val = JSON.stringify(val);  // Objekte und Arrays in json-Strings umwandeln
-      return a.concat("," + String(val).replace(/,/g, '-'));
+      return a.concat("," + String(val).replace(/,|;/g, '-'));
     }, z[i]);
     i++;  // Index für die nächste Zeile
   });
@@ -250,6 +253,7 @@ const makecsv = (ordner = ord5) => {
 const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclStrings = inclPfadStrings, filterTyp = 0) => {  // äußere Attribute vom Json-Objekt mit ineren vertauschen
   // jsonArr -> csvArr -> fileNames -> save
   let jsonZ = await jsonAusOrdner(ordner, false, exclStrings, inclStrings, filterTyp);
+  // await fs.writeJson(path.join(ord3, "jsonZorg" + '.json'), jsonZ);
   let jsonS = objinout(jsonZ); // äußere Attribute mit ineren vertauschen
   let csvZ = csvAusJson(jsonZ, zuerstZeile); // csv erzeugen
   let csvS = csvAusJson(jsonS, zuerstZeile); // csv erzeugenjsonZ
@@ -272,7 +276,7 @@ const csvinout = async (ordner = ord6, exclStrings = exclPfadStrings, inclString
   return jsonS;
 };
 
-// makecsvinout();
+makecsvinout(ord3);
 const check2 = () => {
   const name = "test1";
   const json = { "a": "1", "b": "2" };
@@ -296,5 +300,5 @@ const check4 = () => {
   console.log("o2",o2);
   console.log("io",io);
 };
-check4();
+//check4();
 module.exports = { jsonAusOrdner, csvAusJson, savecsvjson, savecsvjson2, filelistfilter };

@@ -11,9 +11,9 @@ const check1 = () => {
   let o5 = { "a": 1 };
   let o6 = { "b": 2 };
   
-  // let a5 = [].push({ "a": 1 });//[{...jsonZ}, jsonS]; !!!! Problem Array aus Objekten
-  // let a5 = [].push(o5);//[{...jsonZ}, jsonS]; !!!! Problem Array aus Objekten
-  let a5 = [1,4].push("as");//[{...jsonZ}, jsonS]; !!!! Problem Array aus Objekten
+  // let a5 = [].push({ "a": 1 });//[{...jsonZ}, jsonS]; !! Problem Array aus Objekten
+  // let a5 = [].push(o5);//[{...jsonZ}, jsonS]; !! Problem Array aus Objekten
+  let a5 = [1,4].push("as");//[{...jsonZ}, jsonS]; !! Problem Array aus Objekten
   let a9 = [o5];
   let a8 = [o5, o6];
   // console.log("a5",a5);

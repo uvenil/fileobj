@@ -12,13 +12,15 @@ const reststrs = (strArr, fromTop = true) => { // Restmengenstring, => reststrs 
   schnittObj.foundArr.forEach(e1 => {
     filtArr.push(e1.filter( e2 => foundInd === e2[0] ));
   });
-  // Array mit der Restmengen-Strings bilden
+  // Array mit den Restmengen-Strings bilden
   let restStrs = [];
   strArr.forEach((el, ix) => {
     const ind = fromTop ? 0 : filtArr[ix].length -1;
-    const s1 = el.slice(0, filtArr[ix][ind][1]);  // schnittStr jeweils fromTop herausschneiden
-    const s2 = el.slice(filtArr[ix][ind][1] + filtArr[ix][ind][2]);
-    restStrs.push(s1 + s2);
+    // if (!!filtArr[ix][ind]) { // Wert soll nicht undefined sein
+      const s1 = el.slice(0, filtArr[ix][ind][1]);  // schnittStr jeweils fromTop herausschneiden
+      const s2 = el.slice(filtArr[ix][ind][1] + filtArr[ix][ind][2]);
+      restStrs.push(s1 + s2);
+    // }
   });
   return restStrs;
 };
